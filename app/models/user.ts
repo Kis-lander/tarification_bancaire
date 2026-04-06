@@ -1,12 +1,21 @@
 import { DateTime } from 'luxon'
+import { AccessToken, DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
+import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
+import hash from '@adonisjs/core/services/hash'
 import { column } from '@adonisjs/lucid/orm'
 import { UserSchema } from '#database/schema'
 import { hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import Bank from '#models/bank'
 
-export default class User extends UserSchema {
-static table = 'users'
+const AuthFinderUser = withAuthFinder(hash, {
+  uids: ['email'],
+  passwordColumnName: 'password',
+})(UserSchema)
+
+export default class User extends AuthFinderUser {
+  static table = 'users'
+  static accessTokens = DbAccessTokensProvider.forModel(User)
 
   @column({ isPrimary: true })
   declare id: number
@@ -14,11 +23,13 @@ static table = 'users'
   @column()
   declare email: string
 
-  @column()
+  @column({ serializeAs: null })
   declare password: string
 
   @column()
-  declare rule: string
+  declare rule: string | null
+
+  declare currentAccessToken?: AccessToken
 
   // relation
   @hasMany(() => Bank)
@@ -28,5 +39,5 @@ static table = 'users'
   declare createdAt: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+  declare updatedAt: DateTime | null
 }

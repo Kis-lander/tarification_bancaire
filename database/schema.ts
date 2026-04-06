@@ -7,6 +7,27 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class AgencySchema extends BaseModel {
+  static $columns = ['address', 'bankId', 'city', 'createdAt', 'id', 'latitude', 'longitude', 'updatedAt'] as const
+  $columns = AgencySchema.$columns
+  @column()
+  declare address: string
+  @column()
+  declare bankId: number | null
+  @column()
+  declare city: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare latitude: string
+  @column()
+  declare longitude: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class AuthAccessTokenSchema extends BaseModel {
   static $columns = ['abilities', 'createdAt', 'expiresAt', 'hash', 'id', 'lastUsedAt', 'name', 'tokenableId', 'type', 'updatedAt'] as const
   $columns = AuthAccessTokenSchema.$columns

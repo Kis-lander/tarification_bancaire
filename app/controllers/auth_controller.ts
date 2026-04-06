@@ -2,6 +2,11 @@ import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import AuthService from '#services/auth_service'
 
+type HttpErrorLike = {
+  status?: number
+  message?: string
+}
+
 @inject()
 export default class AuthController {
   constructor(protected authService: AuthService) {}
@@ -12,8 +17,9 @@ export default class AuthController {
       const user = await this.authService.register(data)
       return response.created(user)
     } catch (error) {
-      return response.status(error.status || 500).send({
-        message: error.message || 'Une erreur est survenue lors de l\'inscription'
+      const err = error as HttpErrorLike
+      return response.status(err.status ?? 500).send({
+        message: err.message ?? 'Une erreur est survenue lors de l\'inscription'
       })
     }
   }
@@ -29,8 +35,9 @@ export default class AuthController {
 
       return response.ok(result)
     } catch (error) {
-      return response.status(error.status || 500).send({
-        message: error.message || 'Erreur de serveur'
+      const err = error as HttpErrorLike
+      return response.status(err.status ?? 500).send({
+        message: err.message ?? 'Erreur de serveur'
       })
     }
   }

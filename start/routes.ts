@@ -1,10 +1,15 @@
 import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'
 import router from '@adonisjs/core/services/router'
-import router from '@adonisjs/core/services/router'
 import BanksController from '#controllers/banks_controller'
+import AgenciesController from '#controllers/agencies_controller'
 
+// 🌍 Public
 router.on('/').render('pages/home').as('home')
+router.get('/banks', [BanksController, 'index'])
+router.get('/banks/:id', [BanksController, 'show'])
+router.get('/agencies', [AgenciesController, 'index'])
+router.get('/banks/:bankId/agencies', [AgenciesController, 'byBank'])
 
 router
   .group(() => {
@@ -22,17 +27,14 @@ router
   })
   .use(middleware.auth())
 
-  // 🌍 Public
-router.get('/banks', [BanksController, 'index'])
-router.get('/banks/:id', [BanksController, 'show'])
-
 // 🔐 Protégé (BANQUE uniquement)
 router.group(() => {
   router.post('/banks', [BanksController, 'store'])
   router.put('/banks/:id', [BanksController, 'update'])
   router.delete('/banks/:id', [BanksController, 'destroy'])
+  router.post('/agencies', [AgenciesController, 'store'])
+  router.put('/agencies/:id', [AgenciesController, 'update'])
+  router.delete('/agencies/:id', [AgenciesController, 'destroy'])
 })
-.middleware('auth')
-.middleware({
-  role: ['BANK']
-})
+.use(middleware.auth())
+.use(middleware.role(['BANK']))
