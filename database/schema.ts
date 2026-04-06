@@ -32,6 +32,25 @@ export class AuthAccessTokenSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BankSchema extends BaseModel {
+  static $columns = ['createdAt', 'description', 'id', 'isActive', 'name', 'updatedAt', 'userId'] as const
+  $columns = BankSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column()
+  declare description: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare isActive: boolean | null
+  @column()
+  declare name: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: number | null
+}
+
 export class UserSchema extends BaseModel {
   static $columns = ['createdAt', 'email', 'id', 'password', 'rule', 'updatedAt'] as const
   $columns = UserSchema.$columns
