@@ -72,6 +72,55 @@ export class BankSchema extends BaseModel {
   declare userId: number | null
 }
 
+export class ServiceCategorySchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'name', 'updatedAt'] as const
+  $columns = ServiceCategorySchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare name: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class ServiceSchema extends BaseModel {
+  static $columns = ['categoryId', 'createdAt', 'id', 'name', 'updatedAt'] as const
+  $columns = ServiceSchema.$columns
+  @column()
+  declare categoryId: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare name: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class TariffSchema extends BaseModel {
+  static $columns = ['amount', 'bankId', 'createdAt', 'currency', 'id', 'serviceId', 'status', 'updatedAt'] as const
+  $columns = TariffSchema.$columns
+  @column()
+  declare amount: string
+  @column()
+  declare bankId: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column()
+  declare currency: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare serviceId: number | null
+  @column()
+  declare status: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class UserSchema extends BaseModel {
   static $columns = ['createdAt', 'email', 'id', 'password', 'rule', 'updatedAt'] as const
   $columns = UserSchema.$columns

@@ -3,6 +3,7 @@ import { controllers } from '#generated/controllers'
 import router from '@adonisjs/core/services/router'
 import BanksController from '#controllers/banks_controller'
 import AgenciesController from '#controllers/agencies_controller'
+import TariffsController from '#controllers/tariffs_controller'
 
 // 🌍 Public
 router.on('/').render('pages/home').as('home')
@@ -10,6 +11,7 @@ router.get('/banks', [BanksController, 'index'])
 router.get('/banks/:id', [BanksController, 'show'])
 router.get('/agencies', [AgenciesController, 'index'])
 router.get('/banks/:bankId/agencies', [AgenciesController, 'byBank'])
+router.get('/tariffs/history', [TariffsController, 'history'])
 
 router
   .group(() => {
@@ -35,6 +37,18 @@ router.group(() => {
   router.post('/agencies', [AgenciesController, 'store'])
   router.put('/agencies/:id', [AgenciesController, 'update'])
   router.delete('/agencies/:id', [AgenciesController, 'destroy'])
+  router.post('/tariffs', [TariffsController, 'store'])
 })
 .use(middleware.auth())
 .use(middleware.role(['BANK']))
+
+// 🔐 ADMIN
+router
+  .put('/tariffs/:id/approve', [TariffsController, 'approve'])
+  .use(middleware.auth())
+  .use(middleware.role(['ADMIN']))
+
+router
+  .put('/tariffs/:id/reject', [TariffsController, 'reject'])
+  .use(middleware.auth())
+  .use(middleware.role(['ADMIN']))
