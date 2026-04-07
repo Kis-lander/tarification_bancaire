@@ -14,7 +14,9 @@ export default class Service extends ServiceSchema {
   @column()
   declare name: string
 
-  @belongsTo(() => ServiceCategory)
+  @belongsTo(() => ServiceCategory, {
+    foreignKey: 'categoryId',
+  })
   declare category: BelongsTo<typeof ServiceCategory>
 
   @hasMany(() => Tariff)

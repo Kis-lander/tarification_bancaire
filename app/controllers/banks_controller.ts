@@ -1,6 +1,12 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import Bank from '#models/bank'
 import BankService from '#services/bank_service'
+
+type HttpErrorLike = {
+  status?: number
+  message?: string
+}
 
 @inject()
 export default class BanksController {
@@ -11,7 +17,8 @@ export default class BanksController {
       const banks = await this.bankService.getAllActive()
       return response.ok(banks)
     } catch (error) {
-      return response.status(error.status || 500).send({ message: error.message })
+      const err = error as HttpErrorLike
+      return response.status(err.status ?? 500).send({ message: err.message })
     }
   }
 
@@ -19,11 +26,12 @@ export default class BanksController {
     try {
       const user = auth.user!
       const data = request.only(['name', 'description'])
-      
+
       const bank = await this.bankService.createBank(data, user.id)
       return response.created(bank)
     } catch (error) {
-      return response.status(error.status || 400).send({ message: error.message })
+      const err = error as HttpErrorLike
+      return response.status(err.status ?? 400).send({ message: err.message })
     }
   }
 
@@ -32,7 +40,8 @@ export default class BanksController {
       const bank = await this.bankService.findById(params.id)
       return response.ok(bank)
     } catch (error) {
-      return response.status(error.status || 404).send({ message: error.message })
+      const err = error as HttpErrorLike
+      return response.status(err.status ?? 404).send({ message: err.message })
     }
   }
 
@@ -40,19 +49,27 @@ export default class BanksController {
     try {
       const data = request.only(['name', 'description', 'isActive'])
       const bank = await this.bankService.updateBank(params.id, data, auth.user!.id)
-      
+
       return response.ok(bank)
     } catch (error) {
-      return response.status(error.status || 400).send({ message: error.message })
+      const err = error as HttpErrorLike
+      return response.status(err.status ?? 400).send({ message: err.message })
     }
   }
 
   async destroy({ auth, params, response }: HttpContext) {
     try {
       await this.bankService.deactivateBank(params.id, auth.user!.id)
-      return response.ok({ message: 'Banque désactivée avec succès' })
+      return response.ok({ message: 'Banque desactivee avec succes' })
     } catch (error) {
-      return response.status(error.status || 400).send({ message: error.message })
+      const err = error as HttpErrorLike
+      return response.status(err.status ?? 400).send({ message: err.message })
     }
+  }
+
+  async view({ view }: HttpContext) {
+    const banks = await Bank.all()
+
+    return view.render('pages/banks', { banks })
   }
 }

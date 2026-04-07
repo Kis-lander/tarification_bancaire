@@ -1,12 +1,13 @@
-<div class="flash-container">
-  @if(flashMessages.has('error'))
-    @alert.root({ variant: 'destructive', autoDismiss: true })
-      @!alert.description({ text: flashMessages.get('error') })
-    @end
-  @end
+<div class="mx-auto mt-4 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
   @if(flashMessages.has('success'))
-    @alert.root({ variant: 'success', autoDismiss: true })
-      @!alert.description({ text: flashMessages.get('success') })
-    @end
+    <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+      @{{ flashMessages.get('success') }}
+    </div>
+  @end
+
+  @if(flashMessages.has('error'))
+    <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">
+      @{{ flashMessages.get('error') }}
+    </div>
   @end
 </div>

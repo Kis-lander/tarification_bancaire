@@ -1,20 +1,30 @@
-import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'
-import router from '@adonisjs/core/services/router'
-import BanksController from '#controllers/banks_controller'
 import AgenciesController from '#controllers/agencies_controller'
-import TariffsController from '#controllers/tariffs_controller'
+import AnalyticsController from '#controllers/analytic_controller'
+import BanksController from '#controllers/banks_controller'
 import ComparisonsController from '#controllers/comparisons_controller'
+import PublicPagesController from '#controllers/public_pages_controller'
+import TariffsController from '#controllers/tariffs_controller'
+import { middleware } from '#start/kernel'
+import router from '@adonisjs/core/services/router'
 
-// 🌍 Public
-router.on('/').render('pages/home').as('home')
-router.get('/banks', [BanksController, 'index'])
-router.get('/banks/:id', [BanksController, 'show'])
-router.get('/agencies', [AgenciesController, 'index'])
-router.get('/banks/:bankId/agencies', [AgenciesController, 'byBank'])
-router.get('/tariffs/history', [TariffsController, 'history'])
-router.post('/compare', [ComparisonsController, 'compare'])
+// Public pages
+router.get('/', [PublicPagesController, 'home']).as('home')
+router.get('/banks', [PublicPagesController, 'banks']).as('banks.page')
+router.get('/compare', [PublicPagesController, 'compare']).as('compare.page')
+router.get('/map', [PublicPagesController, 'map']).as('map.page')
+router.get('/history', [PublicPagesController, 'history']).as('history.page')
+router.get('/analytics', [PublicPagesController, 'analytics']).as('analytics.page')
 
+// Public JSON endpoints
+router.get('/api/banks', [BanksController, 'index']).as('banks.index')
+router.get('/api/banks/:id', [BanksController, 'show']).as('banks.show')
+router.get('/api/agencies', [AgenciesController, 'index']).as('agencies.index')
+router.get('/api/banks/:bankId/agencies', [AgenciesController, 'byBank']).as('agencies.byBank')
+router.get('/tariffs/history', [TariffsController, 'history']).as('tariffs.history')
+router.post('/compare', [ComparisonsController, 'compare']).as('compare.submit')
+router.get('/analytics/evolution', [AnalyticsController, 'evolution']).as('analytics.evolution')
+router.get('/map/agencies', [AgenciesController, 'map']).as('agencies.map')
 
 router
   .group(() => {
@@ -32,20 +42,19 @@ router
   })
   .use(middleware.auth())
 
-// 🔐 Protégé (BANQUE uniquement)
-router.group(() => {
-  router.post('/banks', [BanksController, 'store'])
-  router.put('/banks/:id', [BanksController, 'update'])
-  router.delete('/banks/:id', [BanksController, 'destroy'])
-  router.post('/agencies', [AgenciesController, 'store'])
-  router.put('/agencies/:id', [AgenciesController, 'update'])
-  router.delete('/agencies/:id', [AgenciesController, 'destroy'])
-  router.post('/tariffs', [TariffsController, 'store'])
-})
-.use(middleware.auth())
-.use(middleware.role(['BANK']))
+router
+  .group(() => {
+    router.post('/banks', [BanksController, 'store'])
+    router.put('/banks/:id', [BanksController, 'update'])
+    router.delete('/banks/:id', [BanksController, 'destroy'])
+    router.post('/agencies', [AgenciesController, 'store'])
+    router.put('/agencies/:id', [AgenciesController, 'update'])
+    router.delete('/agencies/:id', [AgenciesController, 'destroy'])
+    router.post('/tariffs', [TariffsController, 'store'])
+  })
+  .use(middleware.auth())
+  .use(middleware.role(['BANK']))
 
-// 🔐 ADMIN
 router
   .put('/tariffs/:id/approve', [TariffsController, 'approve'])
   .use(middleware.auth())

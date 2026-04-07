@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              institution: {
+                50: '#f4f7fb',
+                100: '#e8eef8',
+                300: '#94a9c9',
+                600: '#1d4f91',
+                800: '#10294a',
+                900: '#0b1c34',
+              },
+              accent: {
+                400: '#d4a63f',
+                500: '#b88a2e',
+              },
+              success: {
+                500: '#0f8b6d',
+              },
+              state: {
+                navy: '#0A1931',
+                body: '#4B5563',
+              },
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            boxShadow: {
+              institution: '0 24px 60px -28px rgba(11, 28, 52, 0.35)',
+            },
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(212, 166, 63, 0.08), transparent 32%),
+          #FFFFFF;
+      }
+
+      .data-mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+    </style>
+    <title>Tarification Bancaire</title>
+  </head>
+  <body class="min-h-screen text-slate-900">
+    @include('partials/header')
+    @include('partials/flash_alerts')
+
+    <main class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      @!section('content')
+    </main>
+
+    @include('partials/footer')
+  </body>
+</html>

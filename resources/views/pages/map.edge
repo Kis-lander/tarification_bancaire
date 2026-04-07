@@ -1,0 +1,100 @@
+@layout('layouts/main')
+
+@section('content')
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <section class="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
+    <div class="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8">
+      <p class="text-sm font-semibold uppercase tracking-[0.25em] text-blue-600">Geolocalisation</p>
+      <h1 class="mt-2 text-3xl font-black text-slate-900">Carte des agences bancaires</h1>
+      <p class="mt-3 text-sm leading-6 text-slate-600">
+        Filtrez les agences par banque pour visualiser leur presence geographique et retrouver rapidement leurs coordonnees.
+      </p>
+
+      <form id="map-filter-form" class="mt-8 space-y-4">
+        <div>
+          <label for="bankId" class="mb-2 block text-sm font-bold text-slate-900">Banque</label>
+          <select
+            id="bankId"
+            name="bankId"
+            class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500"
+          >
+            <option value="">Toutes les banques</option>
+            @each(bank in banks)
+              <option value="@{{ bank.id }}">@{{ bank.name }}</option>
+            @endeach
+          </select>
+        </div>
+
+        <button type="submit" class="w-full rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700">
+          Afficher les agences
+        </button>
+      </form>
+
+      <div id="map-list" class="mt-8 grid gap-3"></div>
+    </div>
+
+    <div class="rounded-[2rem] bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-6">
+      <div id="agencies-map" class="h-[420px] rounded-[1.5rem]"></div>
+    </div>
+  </section>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const mapForm = document.getElementById('map-filter-form')
+    const mapList = document.getElementById('map-list')
+    const mapInstance = L.map('agencies-map').setView([7.9465, -1.0232], 6)
+    const markersLayer = L.layerGroup().addTo(mapInstance)
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(mapInstance)
+
+    const renderAgencies = async () => {
+      const bankId = document.getElementById('bankId').value
+      const url = bankId ? `/map/agencies?bankId=${bankId}` : '/map/agencies'
+      const response = await fetch(url, { headers: { Accept: 'application/json' } })
+      const agencies = await response.json()
+
+      mapList.innerHTML = ''
+      markersLayer.clearLayers()
+
+      if (!agencies.length) {
+        mapList.innerHTML =
+          '<div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-5 text-sm text-slate-500">Aucune agence trouvee pour ce filtre.</div>'
+        return
+      }
+
+      const bounds = []
+
+      agencies.forEach((agency) => {
+        const card = document.createElement('div')
+        card.className = 'rounded-2xl border border-slate-200 bg-slate-50 p-4'
+        card.innerHTML = `
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">${agency.bank}</p>
+          <p class="mt-1 text-base font-bold text-slate-900">${agency.city}</p>
+          <p class="mt-2 text-sm text-slate-600">${agency.address}</p>
+          <p class="mt-2 text-xs text-slate-500">Lat: ${agency.lat} | Lng: ${agency.lng}</p>
+        `
+        mapList.appendChild(card)
+
+        const marker = L.marker([agency.lat, agency.lng]).bindPopup(
+          `<strong>${agency.bank}</strong><br>${agency.city}<br>${agency.address}`
+        )
+        markersLayer.addLayer(marker)
+        bounds.push([agency.lat, agency.lng])
+      })
+
+      if (bounds.length) {
+        mapInstance.fitBounds(bounds, { padding: [30, 30] })
+      }
+    }
+
+    mapForm.addEventListener('submit', async (event) => {
+      event.preventDefault()
+      await renderAgencies()
+    })
+
+    renderAgencies()
+  </script>
+@end

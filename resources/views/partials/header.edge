@@ -1,22 +1,90 @@
-<header>
-  <div>
-    <div>
-      @link({ route: 'home', text: 'Home' })
-        <svg width="auto" height="18" viewBox="0 0 413 38" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M382.5 37.5v-30h7.5V0h15v7.5h7.5v30H405v-15h-15v15h-7.5ZM390 15h15V7.8h-15V15ZM360 37.5V0h7.5v37.5H360ZM315 37.5V0h22.5v7.5h7.5V30h-7.5v7.5H315Zm7.5-7.5h14.7V7.5h-14.7V30ZM277.5 37.5V0H300v7.5h-15V15h15v7.5h-15V30h15v7.5h-22.5ZM225 37.5V0h7.5v7.5h7.5V15h7.5v7.5H240V15h-7.5v22.5H225Zm30 0V15h-7.5V7.5h7.5V0h7.5v37.5H255ZM180 37.5V0h22.5v7.5h7.5V15h-7.5v15h7.5v7.5h-7.5V30H195v-7.5h-7.5v15H180Zm7.5-22.5h14.7V7.5h-14.7V15ZM142.5 37.5V0H165v7.5h-15V15h15v7.5h-15V30h15v7.5h-22.5ZM97.5 37.5V0H120v7.5h7.5V15H120v7.5h-15v15h-7.5ZM105 15h14.7V7.5H105V15ZM60 37.5V15h-7.5V7.5H45V0h7.5v7.5H60V15h7.5v22.5H60Zm15-30V0h7.5v7.5H75ZM67.5 15V7.5H75V15h-7.5ZM0 37.5V0h7.5v15h15V0H30v37.5h-7.5v-15h-15v15H0Z" fill="currentColor"/></svg>
-      @end
+<header class="sticky top-0 z-50 border-b border-slate-200 bg-white text-state-navy shadow-sm backdrop-blur">
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+    <a href="/" class="flex items-center gap-3">
+      <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-state-navy text-lg font-bold text-white shadow-lg shadow-slate-300/50">
+        TB
+      </span>
+      <span>
+        <span class="block text-xs font-semibold uppercase tracking-[0.25em] text-accent-500">BCEAO</span>
+        <span class="block text-lg font-bold text-state-navy">Tarification Bancaire</span>
+      </span>
+    </a>
+
+    <nav class="hidden items-center gap-6 md:flex">
+      <a href="/" class="text-sm font-medium text-state-navy transition hover:text-accent-500">Accueil</a>
+      <a href="/banks" class="text-sm font-medium text-state-navy transition hover:text-accent-500">Banques</a>
+      <a href="/compare" class="text-sm font-medium text-state-navy transition hover:text-accent-500">Comparaison</a>
+      <a href="/map" class="text-sm font-medium text-state-navy transition hover:text-accent-500">Carte</a>
+      <a href="/history" class="text-sm font-medium text-state-navy transition hover:text-accent-500">Historique</a>
+      <a href="/analytics" class="text-sm font-medium text-state-navy transition hover:text-accent-500">Analyses</a>
+    </nav>
+
+    <div class="hidden items-center gap-3 md:flex">
+      <a
+        href="/login"
+        class="px-2 py-2 text-sm font-semibold text-state-navy transition hover:text-accent-500"
+      >
+        Connexion
+      </a>
+      <a
+        href="/signup"
+        class="rounded-full bg-state-navy px-4 py-2 text-sm font-semibold text-white transition hover:bg-institution-800"
+      >
+        Inscription
+      </a>
     </div>
-    <div>
-      <nav>
-        @if(auth.user)
-          @!avatar({ initials: auth.user.initials })
-          @form({ route: 'session.destroy', method: 'POST' })
-            @!button({ text: 'Logout' })
-          @end
-        @else
-          @!link({ route: 'new_account.create', text: 'Signup' })
-          @!link({ route: 'session.create', text: 'Login' })
-        @end
-      </nav>
-    </div>
+
+    <button
+      id="menu-btn"
+      type="button"
+      class="inline-flex items-center justify-center rounded-xl border border-slate-200 p-2 text-state-navy md:hidden"
+      aria-controls="mobile-menu"
+      aria-expanded="false"
+      aria-label="Ouvrir le menu"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 7h16M4 12h16M4 17h16" />
+      </svg>
+    </button>
   </div>
+
+  <div id="mobile-menu" class="hidden border-t border-slate-200 bg-white md:hidden">
+    <nav class="mx-auto grid max-w-7xl gap-2 px-4 py-4 sm:px-6">
+      <a href="/" class="rounded-xl px-4 py-3 text-sm font-medium text-state-navy hover:bg-slate-50 hover:text-accent-500">Accueil</a>
+      <a href="/banks" class="rounded-xl px-4 py-3 text-sm font-medium text-state-navy hover:bg-slate-50 hover:text-accent-500">Banques</a>
+      <a href="/compare" class="rounded-xl px-4 py-3 text-sm font-medium text-state-navy hover:bg-slate-50 hover:text-accent-500">Comparaison</a>
+      <a href="/map" class="rounded-xl px-4 py-3 text-sm font-medium text-state-navy hover:bg-slate-50 hover:text-accent-500">Carte</a>
+      <a href="/history" class="rounded-xl px-4 py-3 text-sm font-medium text-state-navy hover:bg-slate-50 hover:text-accent-500">Historique</a>
+      <a href="/analytics" class="rounded-xl px-4 py-3 text-sm font-medium text-state-navy hover:bg-slate-50 hover:text-accent-500">Analyses</a>
+      <div class="grid grid-cols-2 gap-3 pt-3">
+        <a href="/login" class="px-4 py-3 text-center text-sm font-semibold text-state-navy">
+          Connexion
+        </a>
+        <a href="/signup" class="rounded-full bg-state-navy px-4 py-3 text-center text-sm font-semibold text-white">
+          Inscription
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    const menuButton = document.getElementById('menu-btn')
+    const mobileMenu = document.getElementById('mobile-menu')
+
+    if (menuButton && mobileMenu) {
+      menuButton.addEventListener('click', () => {
+        if (window.innerWidth < 768) {
+          const isHidden = mobileMenu.classList.toggle('hidden')
+          menuButton.setAttribute('aria-expanded', String(!isHidden))
+        }
+      })
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) {
+          mobileMenu.classList.add('hidden')
+          menuButton.setAttribute('aria-expanded', 'false')
+        }
+      })
+    }
+  </script>
 </header>

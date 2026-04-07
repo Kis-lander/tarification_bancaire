@@ -1,0 +1,218 @@
+@layout('layouts/main')
+
+@section('content')
+  <section class="grid gap-8 xl:grid-cols-[0.32fr_0.68fr]">
+    <div class="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-institution-800/10 sm:p-8">
+      <p class="text-sm font-semibold uppercase tracking-[0.25em] text-accent-500">Comparaison</p>
+      <h1 class="mt-2 text-3xl font-black text-slate-900">Comparer plusieurs banques par service</h1>
+      <p class="mt-3 text-sm leading-6 text-slate-600">
+        Selectionnez plusieurs banques et plusieurs services. La comparaison utilise les tarifs valides deja enregistres.
+      </p>
+
+      <div class="mt-6 rounded-3xl bg-institution-900 p-5 text-white shadow-institution">
+        <p class="text-xs font-semibold uppercase tracking-[0.25em] text-accent-400">Filtres avances</p>
+        <p class="mt-2 text-sm leading-6 text-slate-300">
+          Confrontez plusieurs etablissements et plusieurs produits dans une meme grille de lecture.
+        </p>
+      </div>
+
+      <form id="comparison-form" class="mt-8 space-y-8">
+        {{ csrfField() }}
+
+        <div>
+          <div class="mb-3 flex items-center justify-between">
+            <label class="text-sm font-bold text-slate-900">Banques a comparer</label>
+            <span class="text-xs text-slate-500">Choix multiple</span>
+          </div>
+          <div class="grid gap-3 sm:grid-cols-2">
+            @each(bank in banks)
+              <label class="flex items-start gap-3 rounded-2xl border border-institution-800/10 bg-slate-50 p-4 transition hover:border-accent-500 hover:bg-amber-50">
+                <input type="checkbox" name="bankIds" value="@{{ bank.id }}" class="mt-1 h-4 w-4 rounded border-slate-300 text-institution-800" />
+                <span>
+                  <span class="block font-semibold text-slate-900">@{{ bank.name }}</span>
+                  <span class="data-mono text-xs text-slate-500">ID @{{ bank.id }}</span>
+                </span>
+              </label>
+            @endeach
+          </div>
+        </div>
+
+        <div>
+          <div class="mb-3 flex items-center justify-between">
+            <label class="text-sm font-bold text-slate-900">Services concernes</label>
+            <span class="text-xs text-slate-500">Choix multiple</span>
+          </div>
+          <div class="grid gap-3 sm:grid-cols-2">
+            @each(service in services)
+              <label class="flex items-start gap-3 rounded-2xl border border-institution-800/10 bg-slate-50 p-4 transition hover:border-accent-500 hover:bg-amber-50">
+                <input type="checkbox" name="serviceIds" value="@{{ service.id }}" class="mt-1 h-4 w-4 rounded border-slate-300 text-institution-800" />
+                <span>
+                  <span class="block font-semibold text-slate-900">@{{ service.name }}</span>
+                  <span class="text-xs text-slate-500">@{{ service.category ? service.category.name : 'Sans categorie' }}</span>
+                </span>
+              </label>
+            @endeach
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full rounded-full bg-institution-800 px-5 py-3 text-sm font-bold text-white transition hover:bg-institution-900"
+        >
+          Calculer la comparaison
+        </button>
+      </form>
+    </div>
+
+    <div class="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-institution-800/10 sm:p-8">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent-500">Resultats</p>
+          <h2 class="mt-2 text-2xl font-bold text-slate-900">Synthese des tarifs</h2>
+        </div>
+        <span id="comparison-status" class="rounded-full bg-institution-100 px-3 py-1 text-xs font-semibold text-institution-800">
+          En attente
+        </span>
+      </div>
+
+      <div id="comparison-empty" class="mt-8 rounded-3xl border border-dashed border-institution-800/20 bg-slate-50 p-8 text-sm text-slate-500">
+        Choisissez vos banques et vos services, puis lancez le calcul pour voir la matrice tarifaire et la meilleure offre.
+      </div>
+
+      <div id="comparison-results" class="mt-8 hidden space-y-8">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">Matrice des tarifs</h3>
+          <div class="mt-4 overflow-x-auto">
+            <table class="min-w-full overflow-hidden rounded-2xl border border-institution-800/10">
+              <thead id="comparison-head" class="bg-institution-900 text-white"></thead>
+              <tbody id="comparison-body" class="divide-y divide-slate-100 bg-white"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">Classement des meilleures offres</h3>
+          <div id="comparison-best" class="mt-4 grid gap-3"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const comparisonForm = document.getElementById('comparison-form')
+    const comparisonStatus = document.getElementById('comparison-status')
+    const comparisonEmpty = document.getElementById('comparison-empty')
+    const comparisonResults = document.getElementById('comparison-results')
+    const comparisonHead = document.getElementById('comparison-head')
+    const comparisonBody = document.getElementById('comparison-body')
+    const comparisonBest = document.getElementById('comparison-best')
+
+    if (comparisonForm) {
+      comparisonForm.addEventListener('submit', async (event) => {
+        event.preventDefault()
+
+        const formData = new FormData(comparisonForm)
+        const selectedBanks = Array.from(comparisonForm.querySelectorAll('input[name="bankIds"]:checked'))
+        const selectedServices = Array.from(comparisonForm.querySelectorAll('input[name="serviceIds"]:checked'))
+
+        if (!selectedBanks.length || !selectedServices.length) {
+          comparisonStatus.textContent = 'Selection incomplete'
+          comparisonStatus.className = 'rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700'
+          comparisonEmpty.classList.remove('hidden')
+          comparisonEmpty.textContent = 'Selectionnez au moins une banque et un service.'
+          comparisonResults.classList.add('hidden')
+          return
+        }
+
+        comparisonStatus.textContent = 'Chargement'
+        comparisonStatus.className = 'rounded-full bg-institution-100 px-3 py-1 text-xs font-semibold text-institution-800'
+
+        try {
+          const response = await fetch('/compare', {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+            },
+            body: new URLSearchParams(formData),
+          })
+
+          const data = await response.json()
+
+          if (!response.ok) {
+            throw new Error(data.message || 'Erreur lors de la comparaison')
+          }
+
+          const bankMap = Object.fromEntries(
+            selectedBanks.map((input) => {
+              const label = input.parentElement.querySelector('span > span').textContent.trim()
+              return [input.value, label]
+            })
+          )
+          const serviceMap = Object.fromEntries(
+            selectedServices.map((input) => {
+              const label = input.parentElement.querySelector('span > span').textContent.trim()
+              return [input.value, label]
+            })
+          )
+
+          comparisonHead.innerHTML = ''
+          comparisonBody.innerHTML = ''
+          comparisonBest.innerHTML = ''
+
+          const headerRow = document.createElement('tr')
+          headerRow.innerHTML =
+            '<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-[0.2em] text-slate-200">Service</th>' +
+            selectedBanks
+              .map((input) => `<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-[0.2em] text-slate-200">${bankMap[input.value]}</th>`)
+              .join('')
+          comparisonHead.appendChild(headerRow)
+
+          Object.entries(data.comparison).forEach(([serviceId, bankValues], index) => {
+            const row = document.createElement('tr')
+            row.className = index % 2 === 0 ? 'bg-white' : 'bg-slate-50'
+            const cells = selectedBanks
+              .map((input) => {
+                const value = bankValues[input.value]
+                return `<td class="data-mono px-4 py-4 text-sm text-slate-700">${value === null ? '-' : value}</td>`
+              })
+              .join('')
+
+            row.innerHTML = `<td class="px-4 py-4 text-sm font-semibold text-slate-900">${serviceMap[serviceId] || `Service ${serviceId}`}</td>${cells}`
+            comparisonBody.appendChild(row)
+          })
+
+          if (Array.isArray(data.best) && data.best.length) {
+            data.best.forEach((item, index) => {
+              const card = document.createElement('div')
+              card.className = 'rounded-2xl border border-institution-800/10 bg-gradient-to-r from-white to-slate-50 px-4 py-4'
+              card.innerHTML = `
+                <div class="flex items-center justify-between gap-4">
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-accent-500">Rang ${index + 1}</p>
+                    <p class="mt-1 text-base font-bold text-slate-900">${bankMap[String(item.bankId)] || `Banque ${item.bankId}`}</p>
+                  </div>
+                  <p class="data-mono text-sm font-semibold text-slate-700">${item.totalAmount}</p>
+                </div>
+              `
+              comparisonBest.appendChild(card)
+            })
+          } else {
+            comparisonBest.innerHTML =
+              '<div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-5 text-sm text-slate-500">Aucun classement disponible pour cette selection.</div>'
+          }
+
+          comparisonEmpty.classList.add('hidden')
+          comparisonResults.classList.remove('hidden')
+          comparisonStatus.textContent = 'Pret'
+          comparisonStatus.className = 'rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700'
+        } catch (error) {
+          comparisonStatus.textContent = 'Erreur'
+          comparisonStatus.className = 'rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700'
+          comparisonEmpty.classList.remove('hidden')
+          comparisonEmpty.textContent = error.message
+          comparisonResults.classList.add('hidden')
+        }
+      })
+    }
+  </script>
+@end
