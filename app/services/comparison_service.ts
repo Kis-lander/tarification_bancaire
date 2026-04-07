@@ -1,43 +1,68 @@
-import Bank from '#models/bank'
-import Service from '#models/service'
 import Tariff from '#models/tariff'
 import { Exception } from '@adonisjs/core/exceptions'
 
+type ComparisonMatrix = Record<number, Record<number, string | null>>
+
 export default class ComparisonService {
   /**
-   * Construit une matrice de comparaison entre plusieurs banques et services
+   * 🔥 Comparer banques et services (Grille de tarifs validés)
    */
-  async compareBanks(bankIds: number[], serviceIds: number[]) {
+  async compare(bankIds: number[], serviceIds: number[]) {
     try {
-      // 1. Récupérer les données nécessaires en parallèle
-      const [banks, services, tariffs] = await Promise.all([
-        Bank.query().whereIn('id', bankIds),
-        Service.query().whereIn('id', serviceIds),
-        Tariff.query()
-          .whereIn('bankId', bankIds)
-          .whereIn('serviceId', serviceIds)
-          .where('status', 'APPROVED')
-      ])
+      // 1. Récupérer uniquement les tarifs validés (APPROVED)
+      const tariffs = await Tariff.query()
+        .whereIn('bankId', bankIds)
+        .whereIn('serviceId', serviceIds)
+        .where('status', 'APPROVED')
 
-      // 2. Construire la grille de comparaison (Logique métier)
-      return services.map((service) => {
-        const row: any = {
-          service: service.name,
-          values: {}
-        }
+      // 2. Transformer en grille (Matrice Service -> Banque)
+      const result: ComparisonMatrix = {}
 
-        banks.forEach((bank) => {
+      for (const serviceId of serviceIds) {
+        result[serviceId] = {}
+
+        for (const bankId of bankIds) {
           const tariff = tariffs.find(
-            (t) => t.bankId === bank.id && t.serviceId === service.id
+            (t) => t.bankId === bankId && t.serviceId === serviceId
           )
-          // On associe le nom de la banque au montant du tarif trouvé (ou null)
-          row.values[bank.name] = tariff ? tariff.amount : null
-        })
 
-        return row
-      })
+          result[serviceId][bankId] = tariff ? tariff.amount : null
+        }
+      }
+
+      return result
     } catch (error) {
-      throw new Exception('Erreur lors de la génération de la comparaison', { status: 500 })
+      throw new Exception('Erreur lors du calcul de la comparaison', { status: 500 })
+    }
+  }
+
+  /**
+   * 🏆 Trouver la banque la moins chère (Classement par score total)
+   */
+  findBest(comparisonResult: ComparisonMatrix) {
+    try {
+      const scores: Record<number, number> = {}
+
+      for (const serviceId in comparisonResult) {
+        for (const bankId in comparisonResult[serviceId]) {
+          const value = comparisonResult[serviceId][bankId]
+
+          if (value !== null) {
+            const bId = Number(bankId)
+            scores[bId] = (scores[bId] || 0) + Number(value)
+          }
+        }
+      }
+
+      // 🔥 Tri par montant croissant (Le moins cher en premier)
+      return Object.entries(scores)
+        .map(([bankId, total]) => ({
+          bankId: Number(bankId),
+          totalAmount: total,
+        }))
+        .sort((a, b) => a.totalAmount - b.totalAmount)
+    } catch (error) {
+      throw new Exception('Erreur lors du calcul de la meilleure offre', { status: 500 })
     }
   }
 }

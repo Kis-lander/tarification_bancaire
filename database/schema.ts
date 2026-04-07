@@ -72,6 +72,23 @@ export class BankSchema extends BaseModel {
   declare userId: number | null
 }
 
+export class ComparisonSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'selectedBanks', 'selectedServices', 'updatedAt', 'userId'] as const
+  $columns = ComparisonSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare selectedBanks: string
+  @column()
+  declare selectedServices: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: number | null
+}
+
 export class ServiceCategorySchema extends BaseModel {
   static $columns = ['createdAt', 'id', 'name', 'updatedAt'] as const
   $columns = ServiceCategorySchema.$columns

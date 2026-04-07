@@ -4,6 +4,7 @@ import router from '@adonisjs/core/services/router'
 import BanksController from '#controllers/banks_controller'
 import AgenciesController from '#controllers/agencies_controller'
 import TariffsController from '#controllers/tariffs_controller'
+import ComparisonsController from '#controllers/comparisons_controller'
 
 // 🌍 Public
 router.on('/').render('pages/home').as('home')
@@ -12,6 +13,8 @@ router.get('/banks/:id', [BanksController, 'show'])
 router.get('/agencies', [AgenciesController, 'index'])
 router.get('/banks/:bankId/agencies', [AgenciesController, 'byBank'])
 router.get('/tariffs/history', [TariffsController, 'history'])
+router.post('/compare', [ComparisonsController, 'compare'])
+
 
 router
   .group(() => {
