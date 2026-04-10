@@ -107,14 +107,20 @@ export class ServiceCategorySchema extends BaseModel {
 }
 
 export class ServiceSchema extends BaseModel {
-  static $columns = ['categoryId', 'createdAt', 'id', 'name', 'updatedAt'] as const
+  static $columns = ['categoryId', 'code', 'createdAt', 'description', 'id', 'isActive', 'name', 'updatedAt'] as const
   $columns = ServiceSchema.$columns
   @column()
   declare categoryId: number | null
+  @column()
+  declare code: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime | null
+  @column()
+  declare description: string | null
   @column({ isPrimary: true })
   declare id: number
+  @column()
+  declare isActive: boolean
   @column()
   declare name: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })

@@ -1,8 +1,6 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import AuthService from '#services/auth_service'
-import User from '#models/user'
-import BccUser from '#models/bcc_user'
 
 type HttpErrorLike = {
   status?: number
@@ -15,14 +13,13 @@ export default class AuthController {
 
   async register({ request, response }: HttpContext) {
     try {
-      // On garde 'rule' ici car c'est pour la table users classique
       const data = request.only(['email', 'password', 'rule'])
       const user = await this.authService.register(data)
       return response.created(user)
     } catch (error) {
       const err = error as HttpErrorLike
       return response.status(err.status ?? 500).send({
-        message: err.message ?? "Une erreur est survenue lors de l'inscription"
+        message: err.message ?? "Une erreur est survenue lors de l'inscription",
       })
     }
   }
@@ -36,43 +33,32 @@ export default class AuthController {
         return response.unauthorized({ message: 'Identifiants invalides' })
       }
 
-      /**
-       * GESTION EXPLICITE DES DEUX TYPES D'UTILISATEURS
-       */
-      if (result instanceof User) {
-        // Connexion pour un utilisateur standard (Banque, etc.)
-        await auth.use('web').login(result)
-      } 
-      else if (result instanceof BccUser) {
-        // Connexion pour l'admin BCC
-        await auth.use('bcc').login(result)
-      }
+      await auth.use('web').login(result.user)
 
       return response.ok({
-        message: 'Connexion réussie',
-        user: result
+        message: 'Connexion reussie',
+        user: result.user,
+        token: result.token,
       })
-
     } catch (error) {
       const err = error as HttpErrorLike
       return response.status(err.status ?? 500).send({
-        message: err.message ?? 'Erreur de serveur'
+        message: err.message ?? 'Erreur de serveur',
       })
     }
   }
 
   async logout({ auth, response }: HttpContext) {
     try {
-      // On vérifie quel guard est actuellement utilisé pour déconnecter correctement
       if (await auth.use('bcc').check()) {
         await auth.use('bcc').logout()
       } else if (await auth.use('web').check()) {
         await auth.use('web').logout()
       }
 
-      return response.ok({ message: 'Déconnecté avec succès' })
-    } catch (error) {
-      return response.internalServerError({ message: 'Erreur lors de la déconnexion' })
+      return response.ok({ message: 'Deconnecte avec succes' })
+    } catch {
+      return response.internalServerError({ message: 'Erreur lors de la deconnexion' })
     }
   }
 }

@@ -11,14 +11,23 @@ type HttpErrorLike = {
 export default class TariffsController {
   constructor(protected tariffService: TariffService) {}
 
-  /**
-   * ➕ Ajouter tarif
-   */
   async store({ auth, request, response }: HttpContext) {
     try {
-      const data = request.only(['bankId', 'serviceId', 'amount'])
-      const tariff = await this.tariffService.create(data, auth.user!.id)
-      
+      const user = auth.use('web').user!
+
+      if (!user.bankId) {
+        return response.badRequest({ message: 'Ce compte banque nest rattache a aucune banque.' })
+      }
+
+      const data = request.only(['serviceId', 'amount', 'currency'])
+      const tariff = await this.tariffService.create({
+        bankId: user.bankId,
+        serviceId: Number(data.serviceId),
+        amount: String(data.amount),
+        currency: data.currency,
+        submittedBy: user.id,
+      })
+
       return response.created(tariff)
     } catch (error) {
       const err = error as HttpErrorLike
@@ -26,44 +35,15 @@ export default class TariffsController {
     }
   }
 
-  /**
-   * ✅ Validation (ADMIN)
-   */
-  async approve({ params, response }: HttpContext) {
-    try {
-      const tariff = await this.tariffService.updateStatus(params.id, 'APPROVED')
-      return response.ok(tariff)
-    } catch (error) {
-      const err = error as HttpErrorLike
-      return response.status(err.status ?? 400).send({ message: err.message })
-    }
-  }
-
-  /**
-   * ❌ Rejet
-   */
-  async reject({ params, response }: HttpContext) {
-    try {
-      const tariff = await this.tariffService.updateStatus(params.id, 'REJECTED')
-      return response.ok(tariff)
-    } catch (error) {
-      const err = error as HttpErrorLike
-      return response.status(err.status ?? 400).send({ message: err.message })
-    }
-  }
-
-  /**
-   * 📊 Historique
-   */
   async history({ request, response }: HttpContext) {
     try {
       const { bankId, serviceId } = request.qs()
-      
+
       if (!bankId || !serviceId) {
         return response.badRequest({ message: 'bankId et serviceId sont requis' })
       }
 
-      const data = await this.tariffService.getHistory(bankId, serviceId)
+      const data = await this.tariffService.getHistory(Number(bankId), Number(serviceId))
       return response.ok(data)
     } catch (error) {
       const err = error as HttpErrorLike

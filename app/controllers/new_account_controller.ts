@@ -1,29 +1,18 @@
 import User from '#models/user'
-import { signupValidator } from '#validators/user'
+import { bankSignupValidator } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
 import hash from '@adonisjs/core/services/hash'
 
-/**
- * NewAccountController handles user registration.
- * It provides methods for displaying the signup page and creating
- * new user accounts.
- */
 export default class NewAccountController {
-  /**
-   * Display the signup page
-   */
   async create({ view }: HttpContext) {
     return view.render('pages/auth/signup')
   }
 
-  /**
-   * Create a new user account and authenticate the user
-   */
   async store({ request, response, auth }: HttpContext) {
-    const payload = await request.validateUsing(signupValidator)
+    const payload = await request.validateUsing(bankSignupValidator)
     const user = await User.create({
       email: payload.email,
-      rule: payload.rule,
+      rule: 'BANK',
       password: await hash.make(payload.password),
     })
 

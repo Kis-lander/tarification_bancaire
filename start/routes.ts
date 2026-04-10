@@ -1,15 +1,18 @@
 import { controllers } from '#generated/controllers'
 import AgenciesController from '#controllers/agencies_controller'
 import AnalyticsController from '#controllers/analytic_controller'
+import BankTariffsController from '#controllers/bank_tariffs_controller'
 import BanksController from '#controllers/banks_controller'
+import BccBankUsersController from '#controllers/bcc_bank_users_controller'
 import BccPortalController from '#controllers/bcc_portal_controller'
+import BccServicesController from '#controllers/bcc_services_controller'
+import BccTariffReviewsController from '#controllers/bcc_tariff_reviews_controller'
 import ComparisonsController from '#controllers/comparisons_controller'
 import PublicPagesController from '#controllers/public_pages_controller'
 import TariffsController from '#controllers/tariffs_controller'
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 
-// Public pages
 router.get('/', [PublicPagesController, 'home']).as('home')
 router.get('/banks', [PublicPagesController, 'banks']).as('banks.page')
 router.get('/compare', [PublicPagesController, 'compare']).as('compare.page')
@@ -17,7 +20,6 @@ router.get('/map', [PublicPagesController, 'map']).as('map.page')
 router.get('/history', [PublicPagesController, 'history']).as('history.page')
 router.get('/analytics', [PublicPagesController, 'analytics']).as('analytics.page')
 
-// Public JSON endpoints
 router.get('/api/banks', [BanksController, 'index']).as('banks.index')
 router.get('/api/banks/:id', [BanksController, 'show']).as('banks.show')
 router.get('/api/agencies', [AgenciesController, 'index']).as('agencies.index')
@@ -55,32 +57,32 @@ router
 
 router
   .group(() => {
-    // Cette route doit afficher bccbanks.edge via la méthode dashboard
     router.get('/bcc/banks', [BccPortalController, 'dashboard']).as('bcc.banks')
     router.post('/bcc/banks', [BccPortalController, 'storeBank']).as('bcc.banks.store')
+
+    router.get('/bcc/services', [BccServicesController, 'index']).as('bcc.services')
+    router.post('/bcc/services', [BccServicesController, 'store']).as('bcc.services.store')
+
+    router.get('/bcc/bank-users', [BccBankUsersController, 'index']).as('bcc.bankUsers')
+    router.post('/bcc/bank-users', [BccBankUsersController, 'store']).as('bcc.bankUsers.store')
+
+    router.get('/bcc/tariff-reviews', [BccTariffReviewsController, 'index']).as('bcc.tariffReviews')
+    router.post('/bcc/tariff-reviews/:id/approve', [BccTariffReviewsController, 'approve']).as('bcc.tariffReviews.approve')
+    router.post('/bcc/tariff-reviews/:id/reject', [BccTariffReviewsController, 'reject']).as('bcc.tariffReviews.reject')
   })
   .use(middleware.auth({ guards: ['bcc'] }))
   .use(middleware.role(['BCC']))
 
 router
   .group(() => {
-    router.post('/banks', [BanksController, 'store'])
-    router.put('/banks/:id', [BanksController, 'update'])
-    router.delete('/banks/:id', [BanksController, 'destroy'])
+    router.get('/bank/tariffs', [BankTariffsController, 'index']).as('bank.tariffs')
+    router.post('/bank/tariffs', [BankTariffsController, 'store']).as('bank.tariffs.store')
+    router.put('/bank/tariffs/:id', [BankTariffsController, 'update']).as('bank.tariffs.update')
+
+    router.post('/tariffs', [TariffsController, 'store']).as('tariffs.store')
     router.post('/agencies', [AgenciesController, 'store'])
     router.put('/agencies/:id', [AgenciesController, 'update'])
     router.delete('/agencies/:id', [AgenciesController, 'destroy'])
-    router.post('/tariffs', [TariffsController, 'store'])
   })
-  .use(middleware.auth())
+  .use(middleware.auth({ guards: ['web'] }))
   .use(middleware.role(['BANK']))
-
-router
-  .put('/tariffs/:id/approve', [TariffsController, 'approve'])
-  .use(middleware.auth())
-  .use(middleware.role(['ADMIN']))
-
-router
-  .put('/tariffs/:id/reject', [TariffsController, 'reject'])
-  .use(middleware.auth())
-  .use(middleware.role(['ADMIN']))

@@ -1,46 +1,60 @@
 import Tariff from '#models/tariff'
-import Bank from '#models/bank'
 import { Exception } from '@adonisjs/core/exceptions'
+import { DateTime } from 'luxon'
 
 export default class TariffService {
   /**
-   * Créer un nouveau tarif (soumis à validation)
+   * Creer un nouveau tarif soumis a validation
    */
-  async create(data: any, userId: number) {
-    const bank = await Bank.findOrFail(data.bankId)
-
-    // Vérification de propriété
-    if (bank.userId !== userId) {
-      throw new Exception('Accès refusé : vous n\'êtes pas le propriétaire de cette banque', { status: 403 })
-    }
-
+  async create(data: {
+    bankId: number
+    serviceId: number
+    amount: string
+    currency?: string
+    submittedBy?: number | null
+  }) {
     try {
       return await Tariff.create({
         ...data,
-        currency: 'USD',
-        status: 'PENDING'
+        currency: data.currency || 'CDF',
+        status: 'PENDING',
       })
-    } catch (error) {
-      throw new Exception('Erreur lors de la création du tarif', { status: 400 })
+    } catch {
+      throw new Exception('Erreur lors de la creation du tarif', { status: 400 })
     }
   }
 
   /**
-   * Changer le statut d'un tarif (Approve/Reject)
+   * Changer le statut d'un tarif
    */
-  async updateStatus(id: number, status: 'APPROVED' | 'REJECTED') {
+  async updateStatus(
+    id: number,
+    status: 'APPROVED' | 'REJECTED',
+    options?: { approvedBy?: number | null; rejectionReason?: string | null }
+  ) {
     try {
       const tariff = await Tariff.findOrFail(id)
       tariff.status = status
+
+      if (status === 'APPROVED') {
+        tariff.approvedBy = options?.approvedBy ?? null
+        tariff.approvedAt = DateTime.utc()
+        tariff.rejectionReason = null
+      } else {
+        tariff.approvedBy = null
+        tariff.approvedAt = null
+        tariff.rejectionReason = options?.rejectionReason ?? null
+      }
+
       await tariff.save()
       return tariff
-    } catch (error) {
-      throw new Exception('Impossible de mettre à jour le statut du tarif', { status: 400 })
+    } catch {
+      throw new Exception('Impossible de mettre a jour le statut du tarif', { status: 400 })
     }
   }
 
   /**
-   * Récupérer l'historique filtré
+   * Recuperer l'historique filtre
    */
   async getHistory(bankId: number, serviceId: number) {
     try {
@@ -48,8 +62,8 @@ export default class TariffService {
         .where('bankId', bankId)
         .where('serviceId', serviceId)
         .orderBy('createdAt', 'asc')
-    } catch (error) {
-      throw new Exception('Erreur lors de la récupération de l\'historique', { status: 500 })
+    } catch {
+      throw new Exception("Erreur lors de la recuperation de l'historique", { status: 500 })
     }
   }
 }

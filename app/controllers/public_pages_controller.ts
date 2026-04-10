@@ -8,7 +8,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class PublicPagesController {
   private async getServicesWithCategories() {
     const [services, categories] = await Promise.all([
-      Service.query().orderBy('name', 'asc'),
+      Service.query().where('isActive', true).orderBy('name', 'asc'),
       ServiceCategory.query(),
     ])
 
@@ -16,7 +16,7 @@ export default class PublicPagesController {
 
     return services.map((service) => ({
       ...service.serialize(),
-      category: categoriesById.get(service.categoryId) || null,
+      category: service.categoryId ? categoriesById.get(service.categoryId) || null : null,
     }))
   }
 
@@ -24,7 +24,7 @@ export default class PublicPagesController {
     const [banksCount, agenciesCount, servicesCount, approvedTariffs, latestBanks] = await Promise.all([
       Bank.query().where('isActive', true).count('* as total'),
       Agency.query().count('* as total'),
-      Service.query().count('* as total'),
+      Service.query().where('isActive', true).count('* as total'),
       Tariff.query().where('status', 'APPROVED').count('* as total'),
       Bank.query().where('isActive', true).orderBy('createdAt', 'desc').limit(4),
     ])

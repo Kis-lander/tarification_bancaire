@@ -3,80 +3,63 @@ import Bank from '#models/bank'
 import { Exception } from '@adonisjs/core/exceptions'
 
 export default class AgencyService {
-  /**
-   * Liste toutes les agences avec leur banque liée
-   */
   async getAll() {
     try {
       return await Agency.query().preload('bank')
-    } catch (error) {
-      throw new Exception('Impossible de récupérer les agences', { status: 500 })
+    } catch {
+      throw new Exception('Impossible de recuperer les agences', { status: 500 })
     }
   }
 
-  /**
-   * Créer une agence après vérification du propriétaire de la banque
-   */
-  async create(data: any, userId: number) {
+  async create(data: any, bankId: number) {
     const bank = await Bank.findOrFail(data.bankId)
 
-    if (bank.userId !== userId) {
-      throw new Exception('Accès refusé : vous n\'êtes pas le propriétaire de cette banque', { status: 403 })
+    if (bank.id !== bankId) {
+      throw new Exception("Acces refuse : vous n'etes pas autorise a gerer cette banque", { status: 403 })
     }
 
     try {
       return await Agency.create(data)
-    } catch (error) {
-      throw new Exception('Erreur lors de la création de l\'agence', { status: 400 })
+    } catch {
+      throw new Exception("Erreur lors de la creation de l'agence", { status: 400 })
     }
   }
 
-  /**
-   * Liste les agences d'une banque spécifique
-   */
   async getByBank(bankId: number) {
     try {
       return await Agency.query().where('bankId', bankId)
-    } catch (error) {
-      throw new Exception('Banque non trouvée ou erreur de lecture', { status: 404 })
+    } catch {
+      throw new Exception('Banque non trouvee ou erreur de lecture', { status: 404 })
     }
   }
 
-  /**
-   * Mettre à jour une agence avec vérification de sécurité
-   */
-  async update(id: number, data: any, userId: number) {
+  async update(id: number, data: any, bankId: number) {
     const agency = await Agency.findOrFail(id)
-    const bank = await Bank.findOrFail(agency.bankId)
 
-    if (bank.userId !== userId) {
-      throw new Exception('Accès refusé : modification interdite', { status: 403 })
+    if (agency.bankId !== bankId) {
+      throw new Exception('Acces refuse : modification interdite', { status: 403 })
     }
 
     try {
       agency.merge(data)
       await agency.save()
       return agency
-    } catch (error) {
-      throw new Exception('Erreur lors de la mise à jour', { status: 400 })
+    } catch {
+      throw new Exception('Erreur lors de la mise a jour', { status: 400 })
     }
   }
 
-  /**
-   * Supprimer une agence
-   */
-  async delete(id: number, userId: number) {
+  async delete(id: number, bankId: number) {
     const agency = await Agency.findOrFail(id)
-    const bank = await Bank.findOrFail(agency.bankId)
 
-    if (bank.userId !== userId) {
-      throw new Exception('Accès refusé : suppression interdite', { status: 403 })
+    if (agency.bankId !== bankId) {
+      throw new Exception('Acces refuse : suppression interdite', { status: 403 })
     }
 
     try {
       await agency.delete()
       return true
-    } catch (error) {
+    } catch {
       throw new Exception('Erreur lors de la suppression', { status: 500 })
     }
   }

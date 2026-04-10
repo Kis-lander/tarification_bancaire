@@ -10,7 +10,7 @@ export default class Service extends ServiceSchema {
   declare id: number
 
   @column()
-  declare categoryId: number
+  declare categoryId: number | null
 
   @column()
   declare name: string
@@ -19,7 +19,7 @@ export default class Service extends ServiceSchema {
   declare description: string | null
 
   @column()
-  declare code: string
+  declare code: string | null
 
   @column()
   declare isActive: boolean

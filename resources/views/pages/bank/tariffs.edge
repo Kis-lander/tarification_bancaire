@@ -1,0 +1,89 @@
+@layout('layouts/main')
+
+  <section class="grid gap-8 xl:grid-cols-[0.42fr_0.58fr]">
+    <div class="rounded-[2rem] border border-institution-800/10 bg-white p-6 shadow-sm sm:p-8">
+      <p class="text-sm font-semibold uppercase tracking-[0.25em] text-accent-500">Espace Banque</p>
+      <h1 class="mt-2 text-3xl font-black text-state-navy">Soumettre un tarif</h1>
+      <p class="mt-3 text-sm leading-6 text-state-body">
+        Les tarifs soumis ici seront rattaches a votre banque puis transmis a la BCC pour validation.
+      </p>
+
+      <form action="/bank/tariffs" method="POST" class="mt-8 space-y-5">
+        {{ csrfField() }}
+
+        <div>
+          <label for="tariff-service" class="mb-2 block text-sm font-bold text-slate-900">Service</label>
+          <select id="tariff-service" name="serviceId" required class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-state-navy">
+            <option value="">Selectionnez un service</option>
+            @each(service in services)
+              <option value="{{ service.id }}">{{ service.name }}</option>
+            @endeach
+          </select>
+        </div>
+
+        <div>
+          <label for="tariff-amount" class="mb-2 block text-sm font-bold text-slate-900">Montant</label>
+          <input id="tariff-amount" name="amount" type="number" step="0.01" required class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-state-navy" />
+        </div>
+
+        <div>
+          <label for="tariff-currency" class="mb-2 block text-sm font-bold text-slate-900">Devise</label>
+          <input id="tariff-currency" name="currency" type="text" value="CDF" class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-state-navy" />
+        </div>
+
+        <button type="submit" class="w-full rounded-full bg-state-navy px-5 py-3 text-sm font-bold text-white transition hover:bg-institution-800">
+          Soumettre le tarif
+        </button>
+      </form>
+    </div>
+
+    <div class="rounded-[2rem] border border-institution-800/10 bg-white p-6 shadow-sm sm:p-8">
+      <div class="flex items-end justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-[0.25em] text-accent-500">Mes soumissions</p>
+          <h2 class="mt-2 text-2xl font-black text-state-navy">Tarifs de ma banque</h2>
+        </div>
+        <span class="data-mono rounded-full bg-institution-100 px-3 py-1 text-xs font-semibold text-institution-800">
+          {{ tariffs.length }} tarif(s)
+        </span>
+      </div>
+
+      <div class="mt-8 grid gap-4">
+        @each(tariff in tariffs)
+          <article class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <p class="text-lg font-bold text-slate-900">{{ tariff.service ? tariff.service.name : 'Service inconnu' }}</p>
+                <p class="mt-1 text-sm text-slate-600">{{ tariff.amount }} {{ tariff.currency }}</p>
+              </div>
+              <span class="rounded-full px-3 py-1 text-xs font-semibold {{ tariff.status === 'APPROVED' ? 'bg-success-500/10 text-success-500' : (tariff.status === 'REJECTED' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700') }}">
+                {{ tariff.status }}
+              </span>
+            </div>
+
+            @if(tariff.status === 'PENDING')
+              <form action="/bank/tariffs/{{ tariff.id }}" method="POST" class="mt-4 grid gap-3 md:grid-cols-[1fr_140px_140px]">
+                {{ csrfField() }}
+                {{ methodField('PUT') }}
+                <input name="amount" type="number" step="0.01" value="{{ tariff.amount }}" required class="rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-state-navy" />
+                <input name="currency" type="text" value="{{ tariff.currency }}" class="rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-state-navy" />
+                <button type="submit" class="rounded-full bg-white px-4 py-3 text-sm font-bold text-state-navy ring-1 ring-slate-300 transition hover:bg-slate-50">
+                  Mettre a jour
+                </button>
+              </form>
+            @endif
+
+            @if(tariff.rejectionReason)
+              <p class="mt-3 text-sm text-rose-700">Motif: {{ tariff.rejectionReason }}</p>
+            @endif
+          </article>
+        @else
+          <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-sm text-slate-500">
+            Aucun tarif soumis pour le moment.
+          </div>
+        @endeach
+      </div>
+    </div>
+  </section>
+@end
+

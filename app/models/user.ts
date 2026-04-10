@@ -29,11 +29,14 @@ export default class User extends AuthFinderUser {
   @column()
   declare rule: string | null
 
+  @column()
+  declare bankId: number | null
+
   declare currentAccessToken?: AccessToken
 
-  // relation
+  // Relation : le compte BANK appartient a une seule banque
   @belongsTo(() => Bank)
-  declare Bank: BelongsTo<typeof Bank>
+  declare bank: BelongsTo<typeof Bank>
   
   // Relation : tarifs soumis par cet utilisateur
   @hasMany(() => Tariff, { foreignKey: 'submittedBy' })

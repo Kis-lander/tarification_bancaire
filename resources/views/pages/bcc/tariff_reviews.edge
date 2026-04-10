@@ -1,0 +1,81 @@
+@layout('layouts/main')
+
+  <section class="grid gap-8">
+    <div class="rounded-[2rem] border border-institution-800/10 bg-white p-6 shadow-sm sm:p-8">
+      <p class="text-sm font-semibold uppercase tracking-[0.25em] text-accent-500">Validation BCC</p>
+      <h1 class="mt-2 text-3xl font-black text-state-navy">Tarifs en attente</h1>
+
+      <div class="mt-8 grid gap-4">
+        @each(tariff in pendingTariffs)
+          <article class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p class="text-lg font-bold text-slate-900">{{ tariff.bank ? tariff.bank.name : 'Banque inconnue' }}</p>
+                <p class="mt-1 text-sm text-slate-600">{{ tariff.service ? tariff.service.name : 'Service inconnu' }}</p>
+                <p class="mt-1 text-sm text-slate-600">Montant: {{ tariff.amount }} {{ tariff.currency }}</p>
+                <p class="mt-1 text-sm text-slate-500">Soumis par: {{ tariff.author ? tariff.author.email : 'Compte inconnu' }}</p>
+              </div>
+
+              <div class="grid gap-3 md:w-[280px]">
+                <form action="/bcc/tariff-reviews/{{ tariff.id }}/approve" method="POST">
+                  {{ csrfField() }}
+                  <button type="submit" class="w-full rounded-full bg-state-navy px-5 py-3 text-sm font-bold text-white transition hover:bg-institution-800">
+                    Approuver
+                  </button>
+                </form>
+
+                <form action="/bcc/tariff-reviews/{{ tariff.id }}/reject" method="POST" class="space-y-3">
+                  {{ csrfField() }}
+                  <input name="rejectionReason" type="text" placeholder="Motif de rejet" class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-state-navy" />
+                  <button type="submit" class="w-full rounded-full bg-white px-5 py-3 text-sm font-bold text-rose-700 ring-1 ring-rose-200 transition hover:bg-rose-50">
+                    Rejeter
+                  </button>
+                </form>
+              </div>
+            </div>
+          </article>
+        @else
+          <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-sm text-slate-500">
+            Aucun tarif en attente pour le moment.
+          </div>
+        @endeach
+      </div>
+    </div>
+
+    <div class="rounded-[2rem] border border-institution-800/10 bg-white p-6 shadow-sm sm:p-8">
+      <div class="flex items-end justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-[0.25em] text-accent-500">Historique BCC</p>
+          <h2 class="mt-2 text-2xl font-black text-state-navy">Dernieres decisions</h2>
+        </div>
+        <span class="data-mono rounded-full bg-institution-100 px-3 py-1 text-xs font-semibold text-institution-800">
+          {{ reviewedTariffs.length }} decision(s)
+        </span>
+      </div>
+
+      <div class="mt-8 grid gap-4">
+        @each(tariff in reviewedTariffs)
+          <article class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <p class="text-lg font-bold text-slate-900">{{ tariff.bank ? tariff.bank.name : 'Banque inconnue' }}</p>
+                <p class="mt-1 text-sm text-slate-600">{{ tariff.service ? tariff.service.name : 'Service inconnu' }}</p>
+              </div>
+              <span class="rounded-full px-3 py-1 text-xs font-semibold {{ tariff.status === 'APPROVED' ? 'bg-success-500/10 text-success-500' : 'bg-rose-100 text-rose-700' }}">
+                {{ tariff.status }}
+              </span>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">Montant: {{ tariff.amount }} {{ tariff.currency }}</p>
+            @if(tariff.rejectionReason)
+              <p class="mt-2 text-sm text-rose-700">Motif: {{ tariff.rejectionReason }}</p>
+            @endif
+          </article>
+        @else
+          <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-sm text-slate-500">
+            Aucune decision enregistree pour le moment.
+          </div>
+        @endeach
+      </div>
+    </div>
+  </section>
+@end

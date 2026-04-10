@@ -22,12 +22,10 @@ export default class BanksController {
     }
   }
 
-  async store({ auth, request, response }: HttpContext) {
+  async store({ request, response }: HttpContext) {
     try {
-      const user = auth.user!
       const data = request.only(['name', 'description'])
-
-      const bank = await this.bankService.createBank(data, user.id)
+      const bank = await this.bankService.createBank(data)
       return response.created(bank)
     } catch (error) {
       const err = error as HttpErrorLike
@@ -45,10 +43,10 @@ export default class BanksController {
     }
   }
 
-  async update({ auth, params, request, response }: HttpContext) {
+  async update({ params, request, response }: HttpContext) {
     try {
       const data = request.only(['name', 'description', 'isActive'])
-      const bank = await this.bankService.updateBank(params.id, data, auth.user!.id)
+      const bank = await this.bankService.updateBank(params.id, data)
 
       return response.ok(bank)
     } catch (error) {
@@ -57,9 +55,9 @@ export default class BanksController {
     }
   }
 
-  async destroy({ auth, params, response }: HttpContext) {
+  async destroy({ params, response }: HttpContext) {
     try {
-      await this.bankService.deactivateBank(params.id, auth.user!.id)
+      await this.bankService.deactivateBank(params.id)
       return response.ok({ message: 'Banque desactivee avec succes' })
     } catch (error) {
       const err = error as HttpErrorLike
@@ -69,7 +67,6 @@ export default class BanksController {
 
   async view({ view }: HttpContext) {
     const banks = await Bank.all()
-
     return view.render('pages/banks', { banks })
   }
 }

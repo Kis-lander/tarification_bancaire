@@ -26,7 +26,7 @@ export default class Bank extends BankSchema {
     declare users: HasMany<typeof User>
 
     @hasMany(() => Tariff)
-    declare tarriff: HasMany<typeof Tariff>
+    declare tariffs: HasMany<typeof Tariff>
 
     @hasMany(() => Agency)
     declare agencies: HasMany<typeof Agency>

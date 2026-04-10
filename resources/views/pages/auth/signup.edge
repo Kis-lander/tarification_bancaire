@@ -24,15 +24,14 @@
 
       <div class="md:col-span-2">
         <label for="signup-role" class="mb-2 block text-sm font-bold text-slate-900">Role</label>
-        <select
+        <input
           id="signup-role"
           name="rule"
-          required
-          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500"
-        >
-          <option value="USER">Utilisateur</option>
-          <option value="BANK">Banque</option>
-        </select>
+          type="text"
+          value="BANK"
+          readonly
+          class="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm outline-none"
+        />
       </div>
 
       <div>

@@ -44,10 +44,6 @@ export default class SessionController {
 
     await auth.use('web').login(user)
 
-    if (user.rule === 'BCC') {
-      return response.redirect('/bcc/banks')
-    }
-
     response.redirect().toRoute('home')
   }
 
