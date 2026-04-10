@@ -6,27 +6,18 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-
-      table
-        .integer('bank_id')
-        .unsigned()
-        .references('id')
-        .inTable('banks')
-        .onDelete('CASCADE')
-
-      table
-        .integer('service_id')
-        .unsigned()
-        .references('id')
-        .inTable('services')
-        .onDelete('CASCADE')
-
-      table.decimal('amount', 10, 2).notNullable()
-      table.string('currency').defaultTo('USD')
-
-      // 🔥 validation banque centrale
+      table.decimal('amount', 12, 2).notNullable()
+      table.string('currency').defaultTo('CDF')
       table.enum('status', ['PENDING', 'APPROVED', 'REJECTED']).defaultTo('PENDING')
+      
+      // Relations
+      table.integer('bank_id').unsigned().references('id').inTable('banks').onDelete('CASCADE')
+      table.integer('service_id').unsigned().references('id').inTable('services').onDelete('CASCADE')
+      table.integer('submitted_by').unsigned().references('id').inTable('users').onDelete('SET NULL')
+      table.integer('approved_by').unsigned().references('id').inTable('bcc_users').onDelete('SET NULL')
 
+      table.timestamp('approved_at').nullable()
+      table.text('rejection_reason').nullable()
       table.timestamp('created_at')
       table.timestamp('updated_at')
     })

@@ -8,8 +8,6 @@ export default class extends BaseSchema {
       table.increments('id')
       table.string('name').notNullable()
       table.text('description').nullable()
-      // Relation avec user
-      table.integer('user_id').unsigned().references('id').inTable('users').onDelete('CASCADE').onUpdate('CASCADE')
       // Statut actif/inactif pour la banque
       table.boolean('is_active').defaultTo(true)
       table.timestamp('created_at')

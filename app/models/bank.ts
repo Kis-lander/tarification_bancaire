@@ -1,6 +1,5 @@
 import { DateTime } from 'luxon'
-import { column, belongsTo } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import { column } from '@adonisjs/lucid/orm'
 import User from '#models/user'
 import { hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
@@ -26,8 +25,8 @@ export default class Bank extends BankSchema {
     declare isActive: boolean
 
     // relations
-    @belongsTo(() => User)
-    declare user: BelongsTo<typeof User>
+    @hasMany(() => User)
+    declare users: HasMany<typeof User>
 
     @hasMany(() => Agency)
     declare agencies: HasMany<typeof Agency>
