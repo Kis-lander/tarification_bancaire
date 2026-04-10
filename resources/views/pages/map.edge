@@ -1,6 +1,5 @@
 @layout('layouts/main')
 
-@section('content')
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <section class="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
@@ -21,7 +20,7 @@
           >
             <option value="">Toutes les banques</option>
             @each(bank in banks)
-              <option value="@{{ bank.id }}">@{{ bank.name }}</option>
+              <option value="{{ bank.id }}">{{ bank.name }}</option>
             @endeach
           </select>
         </div>

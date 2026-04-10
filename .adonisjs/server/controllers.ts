@@ -8,6 +8,7 @@ export const controllers = {
   Analytic: () => import('#controllers/analytic_controller'),
   Auth: () => import('#controllers/auth_controller'),
   Banks: () => import('#controllers/banks_controller'),
+  BccPortal: () => import('#controllers/bcc_portal_controller'),
   Comparisons: () => import('#controllers/comparisons_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   PublicPages: () => import('#controllers/public_pages_controller'),

@@ -1,6 +1,5 @@
 @layout('layouts/main')
 
-@section('content')
   <section class="mx-auto max-w-2xl rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8">
     <p class="text-sm font-semibold uppercase tracking-[0.25em] text-blue-600">Creation de compte</p>
     <h1 class="mt-2 text-3xl font-black text-slate-900">Inscription</h1>
@@ -21,6 +20,19 @@
           class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500"
           placeholder="email@exemple.com"
         />
+      </div>
+
+      <div class="md:col-span-2">
+        <label for="signup-role" class="mb-2 block text-sm font-bold text-slate-900">Role</label>
+        <select
+          id="signup-role"
+          name="rule"
+          required
+          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500"
+        >
+          <option value="USER">Utilisateur</option>
+          <option value="BANK">Banque</option>
+        </select>
       </div>
 
       <div>

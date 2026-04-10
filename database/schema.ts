@@ -72,21 +72,21 @@ export class BankSchema extends BaseModel {
   declare userId: number | null
 }
 
-export class ComparisonSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'selectedBanks', 'selectedServices', 'updatedAt', 'userId'] as const
-  $columns = ComparisonSchema.$columns
+export class BccUserSchema extends BaseModel {
+  static $columns = ['createdAt', 'email', 'id', 'password', 'role', 'updatedAt'] as const
+  $columns = BccUserSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime | null
+  @column()
+  declare email: string
   @column({ isPrimary: true })
   declare id: number
+  @column({ serializeAs: null })
+  declare password: string
   @column()
-  declare selectedBanks: string
-  @column()
-  declare selectedServices: string
+  declare role: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
-  @column()
-  declare userId: number | null
 }
 
 export class ServiceCategorySchema extends BaseModel {

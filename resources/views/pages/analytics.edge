@@ -1,6 +1,5 @@
 @layout('layouts/main')
 
-@section('content')
   <section class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
     <div class="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8">
       <p class="text-sm font-semibold uppercase tracking-[0.25em] text-blue-600">Analyses</p>
@@ -19,7 +18,7 @@
           >
             <option value="">Selectionnez une banque</option>
             @each(bank in banks)
-              <option value="@{{ bank.id }}">@{{ bank.name }}</option>
+              <option value="{{ bank.id }}">{{ bank.name }}</option>
             @endeach
           </select>
         </div>
@@ -33,7 +32,7 @@
           >
             <option value="">Selectionnez un service</option>
             @each(service in services)
-              <option value="@{{ service.id }}">@{{ service.name }} - @{{ service.category ? service.category.name : 'Sans categorie' }}</option>
+              <option value="{{ service.id }}">{{ service.name }} - {{ service.category ? service.category.name : 'Sans categorie' }}</option>
             @endeach
           </select>
         </div>

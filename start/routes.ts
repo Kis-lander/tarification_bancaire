@@ -2,6 +2,7 @@ import { controllers } from '#generated/controllers'
 import AgenciesController from '#controllers/agencies_controller'
 import AnalyticsController from '#controllers/analytic_controller'
 import BanksController from '#controllers/banks_controller'
+import BccPortalController from '#controllers/bcc_portal_controller'
 import ComparisonsController from '#controllers/comparisons_controller'
 import PublicPagesController from '#controllers/public_pages_controller'
 import TariffsController from '#controllers/tariffs_controller'
@@ -25,6 +26,16 @@ router.get('/tariffs/history', [TariffsController, 'history']).as('tariffs.histo
 router.post('/compare', [ComparisonsController, 'compare']).as('compare.submit')
 router.get('/analytics/evolution', [AnalyticsController, 'evolution']).as('analytics.evolution')
 router.get('/map/agencies', [AgenciesController, 'map']).as('agencies.map')
+router.get('/bcc', [BccPortalController, 'accessPage']).as('bcc.access')
+
+router
+  .group(() => {
+    router.get('bcc/signup', [BccPortalController, 'signupPage']).as('bcc.signup')
+    router.post('bcc/signup', [BccPortalController, 'signup']).as('bcc.signup.store')
+    router.get('bcc/login', [BccPortalController, 'loginPage']).as('bcc.login')
+    router.post('bcc/login', [BccPortalController, 'login']).as('bcc.login.store')
+  })
+  .use(middleware.guest({ guards: ['bcc'] }))
 
 router
   .group(() => {
@@ -34,13 +45,22 @@ router
     router.get('login', [controllers.Session, 'create'])
     router.post('login', [controllers.Session, 'store'])
   })
-  .use(middleware.guest())
+  .use(middleware.guest({ guards: ['web'] }))
 
 router
   .group(() => {
     router.post('logout', [controllers.Session, 'destroy'])
   })
-  .use(middleware.auth())
+  .use(middleware.auth({ guards: ['web', 'bcc'] }))
+
+router
+  .group(() => {
+    // Cette route doit afficher bccbanks.edge via la méthode dashboard
+    router.get('/bcc/banks', [BccPortalController, 'dashboard']).as('bcc.banks')
+    router.post('/bcc/banks', [BccPortalController, 'storeBank']).as('bcc.banks.store')
+  })
+  .use(middleware.auth({ guards: ['bcc'] }))
+  .use(middleware.role(['BCC']))
 
 router
   .group(() => {

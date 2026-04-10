@@ -1,12 +1,12 @@
 <header class="sticky top-0 z-50 border-b border-slate-200 bg-white text-state-navy shadow-sm backdrop-blur">
-  <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+  <div class="mx-auto flex max-w-12xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
     <a href="/" class="flex items-center gap-3">
-      <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-state-navy text-lg font-bold text-white shadow-lg shadow-slate-300/50">
-        TB
+      <span class="flex h-12 w-20 items-center justify-center overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-lg shadow-stone-200/60">
+        <img src="/images/bcc.jpeg" alt="Logo BCC" class="h-full w-full object-cover" />
       </span>
       <span>
-        <span class="block text-xs font-semibold uppercase tracking-[0.25em] text-accent-500">BCEAO</span>
-        <span class="block text-lg font-bold text-state-navy">Tarification Bancaire</span>
+        <span class="block text-[14px] font-semibold uppercase tracking-[0.25em] text-accent-500 sm:text-[20px]">BCC</span>
+        <span class="block text-[12px] font-bold text-state-navy sm:text-lg">Tarification Bancaire</span>
       </span>
     </a>
 
@@ -17,53 +17,120 @@
       <a href="/map" class="text-sm font-medium text-state-navy transition hover:text-accent-500">Carte</a>
       <a href="/history" class="text-sm font-medium text-state-navy transition hover:text-accent-500">Historique</a>
       <a href="/analytics" class="text-sm font-medium text-state-navy transition hover:text-accent-500">Analyses</a>
+      <a href="/bcc"
+              class="rounded-full ml-[3rem] border border-state-navy px-4 py-2 text-sm font-semibold text-state-navy transition hover:border-accent-500 hover:text-accent-500">
+              Espace BCC</a>
     </nav>
 
     <div class="hidden items-center gap-3 md:flex">
-      <a
-        href="/login"
-        class="px-2 py-2 text-sm font-semibold text-state-navy transition hover:text-accent-500"
-      >
-        Connexion
-      </a>
-      <a
-        href="/signup"
-        class="rounded-full bg-state-navy px-4 py-2 text-sm font-semibold text-white transition hover:bg-institution-800"
-      >
-        Inscription
-      </a>
+        @if(currentUser || currentBccUser)
+          <div class="relative" x-data="{ open: false }">
+            <button @click="open = !open" @click.outside="open = false" class="flex items-center gap-3 p-[6px] shadow-md shadow-slate-700/40 rounded-full border border-stone-200 bg-stone-50">
+              <span class="flex h-10 w-10 items-center justify-center rounded-full bg-state-navy text-2xl font-bold text-[green]">
+                {{ currentUser ? currentUser.email.charAt(0).toUpperCase() : (currentBccUser ? currentBccUser.email.charAt(0).toUpperCase() : 'U') }}
+              </span>
+            </button>
+
+            <div x-show="open" 
+              class="absolute right-0 mt-2 w-56 rounded-xl border border-stone-200 bg-white p-4 shadow-xl z-50" 
+              style="display: none;"
+              x-transition>
+              <div class="space-y-1">
+                <p class="text-[10px] font-bold text-stone-400 uppercase tracking-[0.1em]">Informations du compte</p>
+                <p class="text-sm font-bold text-slate-900">{{ currentUser ? (currentUser.rule || 'Utilisateur') : (isBccAuthenticated ? 'Administrateur BCC' : 'Utilisateur') }}</p>
+                <p class="text-[13px] text-slate-500 italic">{{ currentUser ? currentUser.email : (currentBccUser ? currentBccUser.email : '') }}</p>
+              </div>
+            </div>
+          </div>
+
+          <form action="/logout" method="POST">
+            {{ csrfField() }}
+            <button
+              type="submit"
+              class="rounded-full bg-state-navy px-5 py-2.5 text-sm font-semibold text-[red] shadow-md shadow-slate-700/40 transition hover:bg-institution-800"
+            >
+              Se déconnecter
+            </button>
+          </form>
+        @else
+          <a href="/login" class="px-2 py-2 text-sm font-semibold text-[green] transition hover:text-accent-500">
+            Se connecter
+          </a>
+          <a
+            href="/signup"
+            class="rounded-full border border-[red] bg-sky-50 px-5 py-2.5 text-sm font-semibold text-sky-700 shadow-sm transition hover:bg-sky-100"
+          >
+            S'inscrire
+          </a>
+        @end
     </div>
 
     <button
       id="menu-btn"
       type="button"
-      class="inline-flex items-center justify-center rounded-xl border border-slate-200 p-2 text-state-navy md:hidden"
+      class="ml-auto inline-flex items-center justify-center rounded-lg p-1 text-sky-700 shadow-sm md:hidden focus:outline-none"
       aria-controls="mobile-menu"
       aria-expanded="false"
       aria-label="Ouvrir le menu"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 ml-[8rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 7h16M4 12h16M4 17h16" />
       </svg>
     </button>
   </div>
 
-  <div id="mobile-menu" class="hidden border-t border-slate-200 bg-white md:hidden">
-    <nav class="mx-auto grid max-w-7xl gap-2 px-4 py-4 sm:px-6">
-      <a href="/" class="rounded-xl px-4 py-3 text-sm font-medium text-state-navy hover:bg-slate-50 hover:text-accent-500">Accueil</a>
-      <a href="/banks" class="rounded-xl px-4 py-3 text-sm font-medium text-state-navy hover:bg-slate-50 hover:text-accent-500">Banques</a>
-      <a href="/compare" class="rounded-xl px-4 py-3 text-sm font-medium text-state-navy hover:bg-slate-50 hover:text-accent-500">Comparaison</a>
-      <a href="/map" class="rounded-xl px-4 py-3 text-sm font-medium text-state-navy hover:bg-slate-50 hover:text-accent-500">Carte</a>
-      <a href="/history" class="rounded-xl px-4 py-3 text-sm font-medium text-state-navy hover:bg-slate-50 hover:text-accent-500">Historique</a>
-      <a href="/analytics" class="rounded-xl px-4 py-3 text-sm font-medium text-state-navy hover:bg-slate-50 hover:text-accent-500">Analyses</a>
-      <div class="grid grid-cols-2 gap-3 pt-3">
-        <a href="/login" class="px-4 py-3 text-center text-sm font-semibold text-state-navy">
-          Connexion
-        </a>
-        <a href="/signup" class="rounded-full bg-state-navy px-4 py-3 text-center text-sm font-semibold text-white">
-          Inscription
-        </a>
-      </div>
+  <div id="mobile-menu" class="absolute flex justify-end top-[10rem] z-50 hidden w-[min(82vw,320px)] md:hidden">
+    <nav class="grid gap-[1rem] rounded-[1.5rem] border border-sky-200 bg-sky-50 p-4 shadow-xl shadow-sky-100/80">
+      <a href="/" class="px-4 text-center text-sm font-medium text-state-navy hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700">Accueil</a>
+      <a href="/banks" class="px-4 text-center text-sm font-medium text-state-navy hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700">Banques</a>
+      <a href="/compare" class="px-4 text-center text-sm font-medium text-state-navy hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700">Comparaison</a>
+      <a href="/map" class="px-4 text-center text-sm font-medium text-state-navy hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700">Carte</a>
+      <a href="/history" class="px-4 text-center text-sm font-medium text-state-navy hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700">Historique</a>
+      <a href="/analytics" class="px-4 text-center text-sm font-medium text-state-navy hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700">Analyses</a>
+      @if(isBccAuthenticated)
+        <a href="/bcc/banks" class="px-4 text-center text-sm font-medium text-accent-500 hover:border-sky-200 hover:bg-sky-100 hover:text-state-navy">Espace BCC</a>
+      @end
+      @if(currentUser || currentBccUser)
+        <div class="mt-[1rem]" x-data="{ open: false }">
+            <button @click="open = !open" @click.outside="open = false" class="flex items-center pl-[3.5rem] shadow-md shadow-slate-700/40 rounded-full border border-stone-200 bg-stone-50">
+              <span class="flex h-10 w-10 items-center rounded-full bg-state-navy text-xl font-bold text-[green]">
+                {{ currentUser ? currentUser.email.charAt(0).toUpperCase() : (currentBccUser ? currentBccUser.email.charAt(0).toUpperCase() : 'U') }}
+              </span>
+            </button>
+
+            <div x-show="open" 
+              class="absolute right-0 mt-2 w-56 rounded-xl border border-stone-200 bg-white p-4 shadow-xl z-50" 
+              style="display: none;"
+              x-transition>
+              <div class="space-y-1">
+                <p class="text-[10px] font-bold text-stone-400 uppercase tracking-[0.1em]">Informations du compte</p>
+                <p class="text-sm font-bold text-slate-900">{{ currentUser ? (currentUser.rule || 'Utilisateur') : (isBccAuthenticated ? 'Administrateur BCC' : 'Utilisateur') }}</p>
+                <p class="text-xs text-slate-500 italic">{{ currentUser ? currentUser.email : (currentBccUser ? currentBccUser.email : '') }}</p>
+              </div>
+            </div>
+          </div>
+
+          <form action="/logout" method="POST" class="">
+            {{ csrfField() }}
+            <button type="submit" class="w-full rounded-full bg-blue-50 px-4 py-3 text-center text-sm font-semibold text-[red]">
+              Se déconnecter
+            </button>
+          </form>
+      @else
+        <div class="grid gap-3 pt-3">
+          <a href="/bcc" class="rounded-xl border border-state-navy bg-white px-4 py-3 text-center text-sm font-semibold text-state-navy">
+            Espace BCC
+          </a>
+          <div class="grid grid-cols-2 gap-3">
+            <a href="/login" class="rounded-xl bg-state-navy px-4 py-3 text-center text-sm font-semibold text-[green]">
+              Connexion
+            </a>
+            <a href="/signup" class="rounded-xl border border-[red] bg-white px-4 py-3 text-center text-sm font-semibold text-state-navy">
+              Inscription
+            </a>
+          </div>
+        </div>
+      @end
     </nav>
   </div>
 

@@ -18,11 +18,18 @@ export type ScannedRoutes = {
     'compare.submit': { paramsTuple?: []; params?: {} }
     'analytics.evolution': { paramsTuple?: []; params?: {} }
     'agencies.map': { paramsTuple?: []; params?: {} }
+    'bcc.access': { paramsTuple?: []; params?: {} }
+    'bcc.signup': { paramsTuple?: []; params?: {} }
+    'bcc.signup.store': { paramsTuple?: []; params?: {} }
+    'bcc.login': { paramsTuple?: []; params?: {} }
+    'bcc.login.store': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
+    'bcc.banks': { paramsTuple?: []; params?: {} }
+    'bcc.banks.store': { paramsTuple?: []; params?: {} }
     'banks.store': { paramsTuple?: []; params?: {} }
     'banks.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'banks.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -47,8 +54,12 @@ export type ScannedRoutes = {
     'tariffs.history': { paramsTuple?: []; params?: {} }
     'analytics.evolution': { paramsTuple?: []; params?: {} }
     'agencies.map': { paramsTuple?: []; params?: {} }
+    'bcc.access': { paramsTuple?: []; params?: {} }
+    'bcc.signup': { paramsTuple?: []; params?: {} }
+    'bcc.login': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
+    'bcc.banks': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'home': { paramsTuple?: []; params?: {} }
@@ -64,14 +75,21 @@ export type ScannedRoutes = {
     'tariffs.history': { paramsTuple?: []; params?: {} }
     'analytics.evolution': { paramsTuple?: []; params?: {} }
     'agencies.map': { paramsTuple?: []; params?: {} }
+    'bcc.access': { paramsTuple?: []; params?: {} }
+    'bcc.signup': { paramsTuple?: []; params?: {} }
+    'bcc.login': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
+    'bcc.banks': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'compare.submit': { paramsTuple?: []; params?: {} }
+    'bcc.signup.store': { paramsTuple?: []; params?: {} }
+    'bcc.login.store': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
+    'bcc.banks.store': { paramsTuple?: []; params?: {} }
     'banks.store': { paramsTuple?: []; params?: {} }
     'agencies.store': { paramsTuple?: []; params?: {} }
     'tariffs.store': { paramsTuple?: []; params?: {} }

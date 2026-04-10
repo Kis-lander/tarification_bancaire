@@ -1,6 +1,7 @@
 import User from '#models/user'
 import { signupValidator } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
+import hash from '@adonisjs/core/services/hash'
 
 /**
  * NewAccountController handles user registration.
@@ -22,7 +23,8 @@ export default class NewAccountController {
     const payload = await request.validateUsing(signupValidator)
     const user = await User.create({
       email: payload.email,
-      password: payload.password,
+      rule: payload.rule,
+      password: await hash.make(payload.password),
     })
 
     await auth.use('web').login(user)

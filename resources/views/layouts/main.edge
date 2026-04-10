@@ -50,8 +50,9 @@
       body {
         font-family: 'Inter', sans-serif;
         background:
-          radial-gradient(circle at top left, rgba(212, 166, 63, 0.08), transparent 32%),
-          #FFFFFF;
+          radial-gradient(circle at top left, rgba(212, 166, 63, 0.1), transparent 28%),
+          radial-gradient(circle at top right, rgba(10, 25, 49, 0.04), transparent 24%),
+          linear-gradient(180deg, #f9f5ef 0%, #ffffff 38%, #f8fafc 100%);
       }
 
       .data-mono {
@@ -62,7 +63,9 @@
   </head>
   <body class="min-h-screen text-slate-900">
     @include('partials/header')
-    @include('partials/flash_alerts')
+    @if(!hideFlashAlerts)
+      @include('partials/flash_alerts')
+    @end
 
     <main class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       @!section('content')

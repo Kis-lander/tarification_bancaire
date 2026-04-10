@@ -18,7 +18,7 @@ export default class AuthService {
     try {
       return await User.create({
         email: data.email,
-        password: data.password,
+        password: await hash.make(data.password),
         rule: data.rule || 'BANK',
       })
     } catch {

@@ -1,5 +1,6 @@
 import User from '#models/user'
 import type { HttpContext } from '@adonisjs/core/http'
+import hash from '@adonisjs/core/services/hash'
 
 /**
  * SessionController handles user authentication and session management.
@@ -19,9 +20,34 @@ export default class SessionController {
    */
   async store({ request, auth, response }: HttpContext) {
     const { email, password } = request.all()
-    const user = await User.verifyCredentials(email, password)
+    let user: User
+
+    try {
+      user = await User.verifyCredentials(email, password)
+    } catch {
+      const existingUser = await User.findBy('email', email)
+
+      if (!existingUser) {
+        throw new Error('Invalid credentials')
+      }
+
+      const isLegacyPasswordValid = existingUser.password === password
+
+      if (!isLegacyPasswordValid) {
+        throw new Error('Invalid credentials')
+      }
+
+      existingUser.password = await hash.make(password)
+      await existingUser.save()
+      user = existingUser
+    }
 
     await auth.use('web').login(user)
+
+    if (user.rule === 'BCC') {
+      return response.redirect('/bcc/banks')
+    }
+
     response.redirect().toRoute('home')
   }
 
@@ -29,7 +55,12 @@ export default class SessionController {
    * Log out the current user and destroy their session
    */
   async destroy({ auth, response }: HttpContext) {
-    await auth.use('web').logout()
-    response.redirect().toRoute('session.create')
+    if (await auth.use('bcc').check()) {
+      await auth.use('bcc').logout()
+    } else if (await auth.use('web').check()) {
+      await auth.use('web').logout()
+    }
+
+    response.redirect('/login')
   }
 }

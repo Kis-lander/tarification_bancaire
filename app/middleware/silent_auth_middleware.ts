@@ -9,7 +9,16 @@ import type { NextFn } from '@adonisjs/core/types/http'
  */
 export default class SilentAuthMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
-    await ctx.auth.check()
+    await Promise.allSettled([ctx.auth.use('web').check(), ctx.auth.use('bcc').check()])
+
+    const webUser = ctx.auth.use('web').user
+    const bccUser = ctx.auth.use('bcc').user
+
+    ctx.view.share({
+      currentUser: webUser,
+      currentBccUser: bccUser,
+      isBccAuthenticated: !!bccUser && bccUser.role === 'BCC',
+    })
 
     return next()
   }

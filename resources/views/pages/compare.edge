@@ -1,6 +1,5 @@
 @layout('layouts/main')
 
-@section('content')
   <section class="grid gap-8 xl:grid-cols-[0.32fr_0.68fr]">
     <div class="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-institution-800/10 sm:p-8">
       <p class="text-sm font-semibold uppercase tracking-[0.25em] text-accent-500">Comparaison</p>
@@ -27,10 +26,10 @@
           <div class="grid gap-3 sm:grid-cols-2">
             @each(bank in banks)
               <label class="flex items-start gap-3 rounded-2xl border border-institution-800/10 bg-slate-50 p-4 transition hover:border-accent-500 hover:bg-amber-50">
-                <input type="checkbox" name="bankIds" value="@{{ bank.id }}" class="mt-1 h-4 w-4 rounded border-slate-300 text-institution-800" />
+                <input type="checkbox" name="bankIds" value="{{ bank.id }}" class="mt-1 h-4 w-4 rounded border-slate-300 text-institution-800" />
                 <span>
-                  <span class="block font-semibold text-slate-900">@{{ bank.name }}</span>
-                  <span class="data-mono text-xs text-slate-500">ID @{{ bank.id }}</span>
+                  <span class="block font-semibold text-slate-900">{{ bank.name }}</span>
+                  <span class="data-mono text-xs text-slate-500">ID {{ bank.id }}</span>
                 </span>
               </label>
             @endeach
@@ -45,10 +44,10 @@
           <div class="grid gap-3 sm:grid-cols-2">
             @each(service in services)
               <label class="flex items-start gap-3 rounded-2xl border border-institution-800/10 bg-slate-50 p-4 transition hover:border-accent-500 hover:bg-amber-50">
-                <input type="checkbox" name="serviceIds" value="@{{ service.id }}" class="mt-1 h-4 w-4 rounded border-slate-300 text-institution-800" />
+                <input type="checkbox" name="serviceIds" value="{{ service.id }}" class="mt-1 h-4 w-4 rounded border-slate-300 text-institution-800" />
                 <span>
-                  <span class="block font-semibold text-slate-900">@{{ service.name }}</span>
-                  <span class="text-xs text-slate-500">@{{ service.category ? service.category.name : 'Sans categorie' }}</span>
+                  <span class="block font-semibold text-slate-900">{{ service.name }}</span>
+                  <span class="text-xs text-slate-500">{{ service.category ? service.category.name : 'Sans categorie' }}</span>
                 </span>
               </label>
             @endeach
