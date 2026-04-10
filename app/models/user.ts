@@ -3,9 +3,10 @@ import { AccessToken, DbAccessTokensProvider } from '@adonisjs/auth/access_token
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import hash from '@adonisjs/core/services/hash'
 import { UserSchema } from '#database/schema'
-import { column, belongsTo } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import { column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import Bank from '#models/bank'
+import Tariff from '#models/tariff'
 
 const AuthFinderUser = withAuthFinder(hash, {
   uids: ['email'],
@@ -34,6 +35,9 @@ export default class User extends AuthFinderUser {
   @belongsTo(() => Bank)
   declare Bank: BelongsTo<typeof Bank>
   
+  // Relation : tarifs soumis par cet utilisateur
+  @hasMany(() => Tariff, { foreignKey: 'submittedBy' })
+  declare submittedTariffs: HasMany<typeof Tariff>
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

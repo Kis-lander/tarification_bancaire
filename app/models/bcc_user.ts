@@ -1,6 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, beforeSave } from '@adonisjs/lucid/orm'
+import { BaseModel, column, beforeSave, hasMany } from '@adonisjs/lucid/orm'
 import hash from '@adonisjs/core/services/hash'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
+import Tariff from '#models/tariff'
 
 export default class BccUser extends BaseModel {
   @column({ isPrimary: true })
@@ -27,4 +29,7 @@ export default class BccUser extends BaseModel {
       user.password = await hash.make(user.password)
     }
   }
+  // Relation : Un agent BCC peut avoir validé plusieurs tarifs
+  @hasMany(() => Tariff, { foreignKey: 'approvedBy' })
+  declare approvedTariffs: HasMany<typeof Tariff>
 }

@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { ServiceSchema } from '#database/schema'
 import { column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
 import ServiceCategory from '#models/service_category'
@@ -13,6 +14,21 @@ export default class Service extends ServiceSchema {
 
   @column()
   declare name: string
+
+  @column()
+  declare description: string | null
+
+  @column()
+  declare code: string
+
+  @column()
+  declare isActive: boolean
+
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
 
   @belongsTo(() => ServiceCategory, {
     foreignKey: 'categoryId',

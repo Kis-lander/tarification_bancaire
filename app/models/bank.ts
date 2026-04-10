@@ -1,10 +1,10 @@
 import { DateTime } from 'luxon'
-import { column } from '@adonisjs/lucid/orm'
+import { column, hasMany } from '@adonisjs/lucid/orm'
 import User from '#models/user'
-import { hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import Agency from '#models/agency'
 import { BankSchema } from '#database/schema'
+import Tariff from '#models/tariff'
 
 export default class Bank extends BankSchema {
     static table = 'banks'
@@ -19,14 +19,14 @@ export default class Bank extends BankSchema {
     declare description: string | null
 
     @column()
-    declare userId: number
-
-    @column()
     declare isActive: boolean
 
     // relations
     @hasMany(() => User)
     declare users: HasMany<typeof User>
+
+    @hasMany(() => Tariff)
+    declare tarriff: HasMany<typeof Tariff>
 
     @hasMany(() => Agency)
     declare agencies: HasMany<typeof Agency>
