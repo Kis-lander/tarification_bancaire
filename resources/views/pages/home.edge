@@ -42,7 +42,7 @@
           </a>
           @if(isBccAuthenticated)
             <a
-              href="/bcc/banks"
+              href="/bcc"
               class="rounded-xl border border-accent-500 bg-amber-50 px-6 py-3 text-center text-sm font-bold text-state-navy shadow-sm transition hover:bg-amber-100"
             >
               Ouvrir l'espace BCC
@@ -52,7 +52,74 @@
 
         @if(isBccAuthenticated && currentBccUser)
           <div class="mt-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-state-navy">
-            Connecte en tant que BCC: <span class="font-bold">{{ currentBccUser.email }}</span>
+            Connecté en tant que BCC: <span class="font-bold">{{ currentBccUser.email }}</span>
+          </div>
+        @endif
+
+        @if(isBccAuthenticated)
+          <div class="mt-6" x-data="{ openNotifications: false }">
+            <button
+              type="button"
+              @click="openNotifications = !openNotifications"
+              @click.outside="openNotifications = false"
+              class="inline-flex items-center gap-3 rounded-full border-2 border-rose-900 bg-rose-200 px-5 py-3 text-sm font-bold text-rose-950 shadow-sm transition hover:bg-rose-300 hover:border-black"
+            >
+              <span>Notifications</span>
+              <span class="inline-flex h-7 min-w-[1.75rem] items-center justify-center rounded-full bg-rose-600 px-2 text-xs font-black leading-none text-white shadow-sm shadow-rose-700/50">
+                {{ bccNotifications ? bccNotifications.pendingBankRegistrationsCount + bccNotifications.pendingTariffsCount : 0 }}
+              </span>
+            </button>
+
+            <div
+              x-show="openNotifications"
+              x-transition
+              style="display: none;"
+              class="mt-4 w-full max-w-2xl rounded-[1.75rem] border border-amber-300 bg-gradient-to-r from-amber-50 to-white p-5 shadow-sm"
+            >
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.24em] text-accent-500">Notifications BCC</p>
+                  <h2 class="mt-1 text-xl font-black text-state-navy">Demandes en attente</h2>
+                </div>
+                <span class="inline-flex h-8 min-w-[2.25rem] items-center justify-center rounded-full bg-rose-600 px-3 text-xs font-black leading-none text-white shadow-sm shadow-rose-700/30">
+                  {{ bccNotifications ? bccNotifications.pendingBankRegistrationsCount + bccNotifications.pendingTariffsCount : 0 }} total
+                </span>
+              </div>
+
+              <div class="mt-4 grid gap-3">
+                @if(bccNotifications && bccNotifications.pendingBankRegistrationsCount)
+                  @each(registration in bccNotifications.latestPendingBankRegistrations)
+                    <a
+                      href="/bcc/bank-users"
+                      class="block rounded-2xl border border-amber-200 bg-white px-4 py-4 transition hover:-translate-y-0.5 hover:border-accent-500 hover:shadow-sm"
+                    >
+                      <p class="text-sm font-bold text-state-navy">Nouvelle demande d'ouverture de banque</p>
+                      <p class="mt-1 text-sm text-state-body">{{ registration.bankName }} - {{ registration.email }}</p>
+                    </a>
+                  @endeach
+                @endif
+
+                @if(bccNotifications && bccNotifications.pendingTariffsCount)
+                  @each(tariff in bccNotifications.latestPendingTariffs)
+                    <a
+                      href="/bcc/tariff-reviews"
+                      class="block rounded-2xl border border-emerald-200 bg-white px-4 py-4 transition hover:-translate-y-0.5 hover:border-emerald-500 hover:shadow-sm"
+                    >
+                      <p class="text-sm font-bold text-state-navy">Nouvelle demande de tarif</p>
+                      <p class="mt-1 text-sm text-state-body">
+                        {{ tariff.bank ? tariff.bank.name : 'Banque inconnue' }} - {{ tariff.service ? tariff.service.name : 'Service inconnu' }}
+                      </p>
+                    </a>
+                  @endeach
+                @endif
+
+                @if(!bccNotifications || (!bccNotifications.pendingBankRegistrationsCount && !bccNotifications.pendingTariffsCount))
+                  <div class="rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-6 text-sm text-slate-500">
+                    Aucune notification en attente.
+                  </div>
+                @endif
+              </div>
+            </div>
           </div>
         @endif
 

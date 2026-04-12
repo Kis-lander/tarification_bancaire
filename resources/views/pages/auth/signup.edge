@@ -2,10 +2,16 @@
 
   <section class="mx-auto max-w-2xl rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8">
     <p class="text-sm font-semibold uppercase tracking-[0.25em] text-blue-600">Creation de compte</p>
-    <h1 class="mt-2 text-3xl font-black text-slate-900">Inscription</h1>
+    <h1 class="mt-2 text-3xl font-black text-slate-900">Demande de compte BANK</h1>
     <p class="mt-3 text-sm leading-6 text-slate-600">
-      Ouvrez un compte utilisateur pour acceder au back-office ou au suivi des operations selon votre profil.
+      Renseignez votre banque et vos informations de contact. La BCC devra d'abord valider votre demande avant la creation effective du compte.
     </p>
+
+    @if(Object.keys(flashMessages.get('inputErrorsBag', {})).length)
+      <div class="mt-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">
+        Veuillez corriger les informations du formulaire.
+      </div>
+    @end
 
     <form action="/signup" method="POST" class="mt-8 grid gap-5 md:grid-cols-2">
       {{ csrfField() }}
@@ -16,22 +22,60 @@
           id="signup-email"
           name="email"
           type="email"
+          value="{{ old('email', '') }}"
           required
-          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500"
+          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 {{ flashMessages.get('inputErrorsBag', {}).email ? 'border-rose-400' : '' }}"
           placeholder="email@exemple.com"
         />
+        @if(flashMessages.get('inputErrorsBag', {}).email)
+          <p class="mt-2 text-sm text-rose-700">{{ flashMessages.get('inputErrorsBag', {}).email[0] }}</p>
+        @end
       </div>
 
       <div class="md:col-span-2">
-        <label for="signup-role" class="mb-2 block text-sm font-bold text-slate-900">Role</label>
+        <label for="signup-bank-name" class="mb-2 block text-sm font-bold text-slate-900">Nom de la banque</label>
         <input
-          id="signup-role"
-          name="rule"
+          id="signup-bank-name"
+          name="bankName"
           type="text"
-          value="BANK"
-          readonly
-          class="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm outline-none"
+          value="{{ old('bankName', '') }}"
+          required
+          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 {{ flashMessages.get('inputErrorsBag', {}).bankName ? 'border-rose-400' : '' }}"
+          placeholder="Ex: Rawbank"
         />
+        @if(flashMessages.get('inputErrorsBag', {}).bankName)
+          <p class="mt-2 text-sm text-rose-700">{{ flashMessages.get('inputErrorsBag', {}).bankName[0] }}</p>
+        @end
+      </div>
+
+      <div class="md:col-span-2">
+        <label for="signup-bank-description" class="mb-2 block text-sm font-bold text-slate-900">Description de la banque</label>
+        <textarea
+          id="signup-bank-description"
+          name="bankDescription"
+          rows="4"
+          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 {{ flashMessages.get('inputErrorsBag', {}).bankDescription ? 'border-rose-400' : '' }}"
+          placeholder="Presentation courte de la banque"
+        >{{ old('bankDescription', '') }}</textarea>
+        @if(flashMessages.get('inputErrorsBag', {}).bankDescription)
+          <p class="mt-2 text-sm text-rose-700">{{ flashMessages.get('inputErrorsBag', {}).bankDescription[0] }}</p>
+        @end
+      </div>
+
+      <div class="md:col-span-2">
+        <label for="signup-address" class="mb-2 block text-sm font-bold text-slate-900">Ville et pays</label>
+        <input
+          id="signup-address"
+          name="addresses"
+          type="text"
+          value="{{ old('addresses', '') }}"
+          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 {{ flashMessages.get('inputErrorsBag', {}).addresses ? 'border-rose-400' : '' }}"
+          placeholder="Kinshasa, RDC"
+        />
+        <p class="mt-2 text-xs font-medium text-slate-500">Renseignez seulement la ville et le pays au format "Ville, Pays".</p>
+        @if(flashMessages.get('inputErrorsBag', {}).addresses)
+          <p class="mt-2 text-sm text-rose-700">{{ flashMessages.get('inputErrorsBag', {}).addresses[0] }}</p>
+        @end
       </div>
 
       <div>
@@ -41,9 +85,12 @@
           name="password"
           type="password"
           required
-          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500"
+          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 {{ flashMessages.get('inputErrorsBag', {}).password ? 'border-rose-400' : '' }}"
           placeholder="Minimum 8 caracteres"
         />
+        @if(flashMessages.get('inputErrorsBag', {}).password)
+          <p class="mt-2 text-sm text-rose-700">{{ flashMessages.get('inputErrorsBag', {}).password[0] }}</p>
+        @end
       </div>
 
       <div>
@@ -61,9 +108,9 @@
       <div class="md:col-span-2">
         <button
           type="submit"
-          class="w-full rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
+          class="w-full rounded-xl border border-stone-300 bg-blue-100 px-5 py-3 text-sm font-bold text-state-navy shadow-sm transition hover:border-blue-500 hover:bg-blue-200 hover:text-state-navy"
         >
-          Creer mon compte
+          Envoyer la demande a la BCC
         </button>
       </div>
     </form>

@@ -43,6 +43,8 @@ router
   .group(() => {
     router.get('signup', [controllers.NewAccount, 'create'])
     router.post('signup', [controllers.NewAccount, 'store'])
+    router.get('signup/verify', [controllers.NewAccount, 'verifyPage'])
+    router.post('signup/verify', [controllers.NewAccount, 'verifyOtp'])
 
     router.get('login', [controllers.Session, 'create'])
     router.post('login', [controllers.Session, 'store'])
@@ -65,6 +67,8 @@ router
 
     router.get('/bcc/bank-users', [BccBankUsersController, 'index']).as('bcc.bankUsers')
     router.post('/bcc/bank-users', [BccBankUsersController, 'store']).as('bcc.bankUsers.store')
+    router.post('/bcc/bank-users/pending/:id/approve', [BccBankUsersController, 'approve']).as('bcc.bankUsers.approve')
+    router.post('/bcc/bank-users/pending/:id/reject', [BccBankUsersController, 'reject']).as('bcc.bankUsers.reject')
 
     router.get('/bcc/tariff-reviews', [BccTariffReviewsController, 'index']).as('bcc.tariffReviews')
     router.post('/bcc/tariff-reviews/:id/approve', [BccTariffReviewsController, 'approve']).as('bcc.tariffReviews.approve')
@@ -77,6 +81,7 @@ router
   .group(() => {
     router.get('/bank/tariffs', [BankTariffsController, 'index']).as('bank.tariffs')
     router.post('/bank/tariffs', [BankTariffsController, 'store']).as('bank.tariffs.store')
+    router.post('/bank/tariffs/:id', [BankTariffsController, 'update']).as('bank.tariffs.update.post')
     router.put('/bank/tariffs/:id', [BankTariffsController, 'update']).as('bank.tariffs.update')
 
     router.post('/tariffs', [TariffsController, 'store']).as('tariffs.store')

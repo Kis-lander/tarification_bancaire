@@ -14,6 +14,7 @@ export default class ComparisonService {
         .whereIn('bankId', bankIds)
         .whereIn('serviceId', serviceIds)
         .where('status', 'APPROVED')
+        .orderBy('createdAt', 'desc')
 
       // 2. Transformer en grille (Matrice Service -> Banque)
       const result: ComparisonMatrix = {}

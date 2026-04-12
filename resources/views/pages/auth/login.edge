@@ -7,6 +7,12 @@
       Connectez-vous pour soumettre, valider ou administrer les tarifs selon votre role.
     </p>
 
+    @if(flashMessages.has('error'))
+      <div class="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        {{ flashMessages.get('error') }}
+      </div>
+    @end
+
     <form action="/login" method="POST" class="mt-8 space-y-5">
       {{ csrfField() }}
 
@@ -16,8 +22,9 @@
           id="email"
           name="email"
           type="email"
+          value="{{ flashMessages.get('email', '') }}"
           required
-          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500"
+          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 {{ flashMessages.has('error') ? 'border-red-500' : '' }}"
           placeholder="nom@banque.com"
         />
       </div>
@@ -29,7 +36,7 @@
           name="password"
           type="password"
           required
-          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500"
+          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 {{ flashMessages.has('error') ? 'border-red-500' : '' }}"
           placeholder="Votre mot de passe"
         />
       </div>
@@ -41,7 +48,7 @@
 
     <p class="mt-6 text-center text-sm text-slate-500">
       Pas encore de compte ?
-      <a href="/signup" class="font-semibold text-blue-600 hover:text-blue-800">Creer un compte</a>
+      <a href="/signup" class="font-semibold text-blue-600 hover:text-blue-800">Créer un compte</a>
     </p>
   </section>
 @end

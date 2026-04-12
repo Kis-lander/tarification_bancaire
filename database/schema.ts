@@ -53,6 +53,31 @@ export class AuthAccessTokenSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BankSignupVerificationSchema extends BaseModel {
+  static $columns = ['addresses', 'bankDescription', 'bankName', 'createdAt', 'email', 'id', 'otpCode', 'otpExpiresAt', 'password', 'updatedAt'] as const
+  $columns = BankSignupVerificationSchema.$columns
+  @column()
+  declare addresses: string | null
+  @column()
+  declare bankDescription: string | null
+  @column()
+  declare bankName: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare email: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare otpCode: string
+  @column.dateTime()
+  declare otpExpiresAt: DateTime
+  @column({ serializeAs: null })
+  declare password: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BankSchema extends BaseModel {
   static $columns = ['createdAt', 'description', 'id', 'isActive', 'name', 'updatedAt'] as const
   $columns = BankSchema.$columns
@@ -83,6 +108,27 @@ export class BccUserSchema extends BaseModel {
   declare password: string
   @column()
   declare role: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class PendingBankRegistrationSchema extends BaseModel {
+  static $columns = ['addresses', 'bankDescription', 'bankName', 'createdAt', 'email', 'id', 'password', 'updatedAt'] as const
+  $columns = PendingBankRegistrationSchema.$columns
+  @column()
+  declare addresses: string | null
+  @column()
+  declare bankDescription: string | null
+  @column()
+  declare bankName: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare email: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column({ serializeAs: null })
+  declare password: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
@@ -157,8 +203,10 @@ export class TariffSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['bankId', 'createdAt', 'email', 'id', 'password', 'rule', 'updatedAt'] as const
+  static $columns = ['addresses', 'bankId', 'createdAt', 'email', 'id', 'password', 'rule', 'updatedAt'] as const
   $columns = UserSchema.$columns
+  @column()
+  declare addresses: string | null
   @column()
   declare bankId: number | null
   @column.dateTime({ autoCreate: true })

@@ -46,7 +46,9 @@ export default class BccPortalController {
   }
 
   async loginPage({ view }: HttpContext) {
-    return view.render('pages/bcc/bcclogin')
+    return view.render('pages/bcc/bcclogin', {
+      hideFlashAlerts: true,
+    })
   }
 
   async login({ request, auth, response, session }: HttpContext) {

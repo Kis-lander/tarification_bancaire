@@ -61,6 +61,7 @@ export default class TariffService {
       return await Tariff.query()
         .where('bankId', bankId)
         .where('serviceId', serviceId)
+        .where('status', 'APPROVED')
         .orderBy('createdAt', 'asc')
     } catch {
       throw new Exception("Erreur lors de la recuperation de l'historique", { status: 500 })

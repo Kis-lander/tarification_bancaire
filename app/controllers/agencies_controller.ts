@@ -1,7 +1,7 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import AgencyService from '#services/agency_service'
-import Agency from '#models/agency'
+import User from '#models/user'
 
 type HttpErrorLike = {
   status?: number
@@ -89,23 +89,57 @@ export default class AgenciesController {
   async map({ request, response }: HttpContext) {
     const { bankId } = request.qs()
 
-    let query = Agency.query().preload('bank')
+    let bankUsersQuery = User.query().where('rule', 'BANK').whereNotNull('addresses').preload('bank')
 
     if (bankId) {
-      query = query.where('bank_id', bankId)
+      bankUsersQuery = bankUsersQuery.where('bank_id', bankId)
     }
 
-    const agencies = await query
+    const bankUsers = await bankUsersQuery
 
-    const result = agencies.map((agency) => ({
-      id: agency.id,
-      bank: agency.bank.name,
-      city: agency.city,
-      address: agency.address,
-      lat: Number(agency.latitude),
-      lng: Number(agency.longitude),
-    }))
+    const uniqueBankLocations = new Map<string, {
+      id: number
+      bank: string
+      city: string
+      country: string
+      address: string
+      searchQuery: string
+      sourceLabel: string
+    }>()
 
-    return response.ok(result)
+    bankUsers.forEach((user) => {
+      const rawAddress = (user.addresses || '').trim()
+      if (!rawAddress) {
+        return
+      }
+
+      const parts = rawAddress
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean)
+
+      if (parts.length < 2) {
+        return
+      }
+
+      const city = parts[0]
+      const country = parts.slice(1).join(', ')
+      const bankName = user.bank?.name || 'Banque inconnue'
+      const key = `${bankName.toLowerCase()}::${city.toLowerCase()}::${country.toLowerCase()}`
+
+      if (!uniqueBankLocations.has(key)) {
+        uniqueBankLocations.set(key, {
+          id: user.id,
+          bank: bankName,
+          city,
+          country,
+          address: `${city}, ${country}`,
+          searchQuery: `${bankName}, ${country}`,
+          sourceLabel: 'Ville et pays declares par la banque',
+        })
+      }
+    })
+
+    return response.ok(Array.from(uniqueBankLocations.values()))
   }
 }

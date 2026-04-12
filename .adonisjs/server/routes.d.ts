@@ -25,6 +25,8 @@ export type ScannedRoutes = {
     'bcc.login.store': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
+    'new_account.verify_page': { paramsTuple?: []; params?: {} }
+    'new_account.verify_otp': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
@@ -34,11 +36,14 @@ export type ScannedRoutes = {
     'bcc.services.store': { paramsTuple?: []; params?: {} }
     'bcc.bankUsers': { paramsTuple?: []; params?: {} }
     'bcc.bankUsers.store': { paramsTuple?: []; params?: {} }
+    'bcc.bankUsers.approve': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bcc.bankUsers.reject': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bcc.tariffReviews': { paramsTuple?: []; params?: {} }
     'bcc.tariffReviews.approve': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bcc.tariffReviews.reject': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bank.tariffs': { paramsTuple?: []; params?: {} }
     'bank.tariffs.store': { paramsTuple?: []; params?: {} }
+    'bank.tariffs.update.post': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bank.tariffs.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'tariffs.store': { paramsTuple?: []; params?: {} }
     'agencies.store': { paramsTuple?: []; params?: {} }
@@ -63,6 +68,7 @@ export type ScannedRoutes = {
     'bcc.signup': { paramsTuple?: []; params?: {} }
     'bcc.login': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
+    'new_account.verify_page': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'bcc.banks': { paramsTuple?: []; params?: {} }
     'bcc.services': { paramsTuple?: []; params?: {} }
@@ -88,6 +94,7 @@ export type ScannedRoutes = {
     'bcc.signup': { paramsTuple?: []; params?: {} }
     'bcc.login': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
+    'new_account.verify_page': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'bcc.banks': { paramsTuple?: []; params?: {} }
     'bcc.services': { paramsTuple?: []; params?: {} }
@@ -100,14 +107,18 @@ export type ScannedRoutes = {
     'bcc.signup.store': { paramsTuple?: []; params?: {} }
     'bcc.login.store': { paramsTuple?: []; params?: {} }
     'new_account.store': { paramsTuple?: []; params?: {} }
+    'new_account.verify_otp': { paramsTuple?: []; params?: {} }
     'session.store': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
     'bcc.banks.store': { paramsTuple?: []; params?: {} }
     'bcc.services.store': { paramsTuple?: []; params?: {} }
     'bcc.bankUsers.store': { paramsTuple?: []; params?: {} }
+    'bcc.bankUsers.approve': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bcc.bankUsers.reject': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bcc.tariffReviews.approve': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bcc.tariffReviews.reject': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bank.tariffs.store': { paramsTuple?: []; params?: {} }
+    'bank.tariffs.update.post': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'tariffs.store': { paramsTuple?: []; params?: {} }
     'agencies.store': { paramsTuple?: []; params?: {} }
   }

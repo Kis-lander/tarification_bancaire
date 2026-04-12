@@ -17,8 +17,8 @@ export default class AuthService {
   async register(data: RegisterPayload) {
     try {
       return await User.create({
-        email: data.email,
-        password: await hash.make(data.password),
+        email: data.email.trim().toLowerCase(),
+        password: data.password,
         rule: data.rule || 'BANK',
       })
     } catch {
@@ -28,7 +28,7 @@ export default class AuthService {
 
   async login(data: LoginPayload) {
     try {
-      const user = await User.findBy('email', data.email)
+      const user = await User.findBy('email', data.email.trim().toLowerCase())
       if (!user) {
         return null
       }

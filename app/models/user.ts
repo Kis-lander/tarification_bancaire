@@ -32,6 +32,9 @@ export default class User extends AuthFinderUser {
   @column()
   declare bankId: number | null
 
+  @column()
+  declare addresses: string | null
+
   declare currentAccessToken?: AccessToken
 
   // Relation : le compte BANK appartient a une seule banque

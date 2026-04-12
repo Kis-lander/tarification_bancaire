@@ -18,12 +18,7 @@
       <a href="/history" class="text-sm font-medium text-state-navy transition hover:text-accent-500">Historique</a>
       <a href="/analytics" class="text-sm font-medium text-state-navy transition hover:text-accent-500">Analyses</a>
       @if(currentUser && currentUser.rule === 'BANK')
-        <a href="/bank/tariffs" class="text-sm font-medium text-state-navy transition hover:text-accent-500">Mes tarifs</a>
-      @end
-      @if(isBccAuthenticated)
-        <a href="/bcc/services" class="text-sm font-medium text-state-navy transition hover:text-accent-500">Services</a>
-        <a href="/bcc/bank-users" class="text-sm font-medium text-state-navy transition hover:text-accent-500">Comptes BANK</a>
-        <a href="/bcc/tariff-reviews" class="text-sm font-medium text-state-navy transition hover:text-accent-500">Validation</a>
+        <a href="/bank/tariffs" class="text-sm font-medium text-state-navy transition hover:text-accent-500">Fixer les tarifications</a>
       @end
       <a href="/bcc"
               class="rounded-full ml-[3rem] border border-state-navy px-4 py-2 text-sm font-semibold text-state-navy transition hover:border-accent-500 hover:text-accent-500">
@@ -96,13 +91,10 @@
       <a href="/history" class="px-4 text-center text-sm font-medium text-state-navy hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700">Historique</a>
       <a href="/analytics" class="px-4 text-center text-sm font-medium text-state-navy hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700">Analyses</a>
       @if(currentUser && currentUser.rule === 'BANK')
-        <a href="/bank/tariffs" class="px-4 text-center text-sm font-medium text-state-navy hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700">Mes tarifs</a>
+        <a href="/bank/tariffs" class="px-4 text-center text-sm font-medium text-state-navy hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700">Fixer les tarifications</a>
       @end
       @if(isBccAuthenticated)
-        <a href="/bcc/banks" class="px-4 text-center text-sm font-medium text-accent-500 hover:border-sky-200 hover:bg-sky-100 hover:text-state-navy">Espace BCC</a>
-        <a href="/bcc/services" class="px-4 text-center text-sm font-medium text-state-navy hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700">Services</a>
-        <a href="/bcc/bank-users" class="px-4 text-center text-sm font-medium text-state-navy hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700">Comptes BANK</a>
-        <a href="/bcc/tariff-reviews" class="px-4 text-center text-sm font-medium text-state-navy hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700">Validation</a>
+        <a href="/bcc" class="px-4 text-center text-sm font-medium text-accent-500 hover:border-sky-200 hover:bg-sky-100 hover:text-state-navy">Espace BCC</a>
       @end
       @if(currentUser || currentBccUser)
         <div class="mt-[1rem]" x-data="{ open: false }">

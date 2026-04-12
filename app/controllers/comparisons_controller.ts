@@ -11,10 +11,23 @@ type HttpErrorLike = {
 export default class ComparisonsController {
   constructor(protected comparisonService: ComparisonService) {}
 
+  private normalizeIds(value: unknown): number[] {
+    if (Array.isArray(value)) {
+      return value.map(Number).filter((item) => Number.isFinite(item) && item > 0)
+    }
+
+    if (value === null || value === undefined || value === '') {
+      return []
+    }
+
+    const parsedValue = Number(value)
+    return Number.isFinite(parsedValue) && parsedValue > 0 ? [parsedValue] : []
+  }
+
   async compare({ request, response }: HttpContext) {
     try {
-      const bankIds = (request.input('bankIds', []) as Array<number | string>).map(Number)
-      const serviceIds = (request.input('serviceIds', []) as Array<number | string>).map(Number)
+      const bankIds = this.normalizeIds(request.input('bankIds', request.input('bankIds[]', [])))
+      const serviceIds = this.normalizeIds(request.input('serviceIds', request.input('serviceIds[]', [])))
 
       if (bankIds.length === 0 || serviceIds.length === 0) {
         return response.badRequest({

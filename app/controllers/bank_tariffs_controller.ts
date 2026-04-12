@@ -3,7 +3,7 @@ import Tariff from '#models/tariff'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class BankTariffsController {
-  async index({ auth, view, response, session }: HttpContext) {
+  async index({ auth, view, response, request, session }: HttpContext) {
     const user = auth.use('web').user!
 
     if (!user.bankId) {
@@ -19,9 +19,27 @@ export default class BankTariffsController {
         .orderBy('createdAt', 'desc'),
     ])
 
+    const latestApprovedTariffs = tariffs.filter(
+      (tariff, index, items) =>
+        tariff.status === 'APPROVED' && items.findIndex((item) => item.serviceId === tariff.serviceId && item.status === 'APPROVED') === index
+    )
+
+    const latestPendingTariffs = tariffs.filter(
+      (tariff, index, items) =>
+        tariff.status === 'PENDING' && items.findIndex((item) => item.serviceId === tariff.serviceId && item.status === 'PENDING') === index
+    )
+
     return view.render('pages/bank/tariffs', {
       services,
       tariffs,
+      latestApprovedTariffs,
+      latestPendingTariffs,
+      draftTariff: {
+        serviceId: String(request.input('serviceId', '')),
+        amount: String(request.input('amount', '')),
+        currency: String(request.input('currency', 'CDF')),
+      },
+      isEditingTariff: !!request.input('serviceId'),
       user,
       hideFlashAlerts: true,
     })
@@ -36,10 +54,27 @@ export default class BankTariffsController {
     }
 
     const data = request.only(['serviceId', 'amount', 'currency'])
+    const serviceId = Number(data.serviceId)
+
+    const existingPendingTariff = await Tariff.query()
+      .where('bankId', user.bankId)
+      .where('serviceId', serviceId)
+      .where('status', 'PENDING')
+      .orderBy('updatedAt', 'desc')
+      .first()
+
+    if (existingPendingTariff) {
+      existingPendingTariff.amount = String(data.amount)
+      existingPendingTariff.currency = data.currency || existingPendingTariff.currency || 'CDF'
+      await existingPendingTariff.save()
+
+      session.flash('success', 'La demande de tarification en attente a ete mise a jour et reste soumise a la validation BCC.')
+      return response.redirect('/bank/tariffs')
+    }
 
     await Tariff.create({
       bankId: user.bankId,
-      serviceId: Number(data.serviceId),
+      serviceId,
       amount: String(data.amount),
       currency: data.currency || 'CDF',
       status: 'PENDING',

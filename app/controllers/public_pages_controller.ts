@@ -1,5 +1,6 @@
 import Agency from '#models/agency'
 import Bank from '#models/bank'
+import PendingBankRegistration from '#models/pending_bank_registration'
 import Service from '#models/service'
 import ServiceCategory from '#models/service_category'
 import Tariff from '#models/tariff'
@@ -21,12 +22,14 @@ export default class PublicPagesController {
   }
 
   async home({ view }: HttpContext) {
-    const [banksCount, agenciesCount, servicesCount, approvedTariffs, latestBanks] = await Promise.all([
+    const [banksCount, agenciesCount, servicesCount, approvedTariffs, latestBanks, pendingBankRegistrations, pendingTariffs] = await Promise.all([
       Bank.query().where('isActive', true).count('* as total'),
       Agency.query().count('* as total'),
       Service.query().where('isActive', true).count('* as total'),
       Tariff.query().where('status', 'APPROVED').count('* as total'),
       Bank.query().where('isActive', true).orderBy('createdAt', 'desc').limit(4),
+      PendingBankRegistration.query().orderBy('createdAt', 'desc').limit(5),
+      Tariff.query().where('status', 'PENDING').preload('bank').preload('service').orderBy('createdAt', 'desc').limit(5),
     ])
 
     return view.render('pages/home', {
@@ -37,6 +40,12 @@ export default class PublicPagesController {
         approvedTariffs: Number(approvedTariffs[0].$extras.total || 0),
       },
       latestBanks,
+      bccNotifications: {
+        pendingBankRegistrationsCount: pendingBankRegistrations.length,
+        pendingTariffsCount: pendingTariffs.length,
+        latestPendingBankRegistrations: pendingBankRegistrations,
+        latestPendingTariffs: pendingTariffs,
+      },
     })
   }
 
