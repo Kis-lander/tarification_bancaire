@@ -16,23 +16,23 @@
           extend: {
             colors: {
               institution: {
-                50: '#f4f7fb',
-                100: '#e8eef8',
-                300: '#94a9c9',
-                600: '#1d4f91',
-                800: '#10294a',
-                900: '#0b1c34',
+                50: '#f8f9fa',
+                100: '#eef1f4',
+                300: '#b0bec5',
+                600: '#455A64',
+                800: '#24323d',
+                900: '#1A237E',
               },
               accent: {
-                400: '#d4a63f',
-                500: '#b88a2e',
+                400: '#c49a2c',
+                500: '#B8860B',
               },
               success: {
-                500: '#0f8b6d',
+                500: '#2E7D32',
               },
               state: {
-                navy: '#0A1931',
-                body: '#4B5563',
+                navy: '#1A237E',
+                body: '#455A64',
               },
             },
             fontFamily: {
@@ -47,16 +47,148 @@
       }
     </script>
     <style>
+      :root {
+        color-scheme: light;
+        --institution-navy: #1a237e;
+        --institution-off-white: #f8f9fa;
+        --institution-anthracite: #455a64;
+        --institution-gold: #b8860b;
+        --institution-success: #2e7d32;
+        --institution-border: rgba(69, 90, 100, 0.22);
+        --institution-border-strong: rgba(69, 90, 100, 0.32);
+        --institution-surface: rgba(255, 255, 255, 0.92);
+      }
+
       body {
         font-family: 'Inter', sans-serif;
         background:
-          radial-gradient(circle at top left, rgba(212, 166, 63, 0.1), transparent 28%),
-          radial-gradient(circle at top right, rgba(10, 25, 49, 0.04), transparent 24%),
-          linear-gradient(180deg, #f9f5ef 0%, #ffffff 38%, #f8fafc 100%);
+          linear-gradient(180deg, rgba(26, 35, 126, 0.04) 0%, rgba(248, 249, 250, 0.98) 18%, #f8f9fa 100%);
+        color: var(--institution-anthracite);
+        letter-spacing: -0.01em;
       }
 
       .data-mono {
         font-family: 'JetBrains Mono', monospace;
+        font-variant-numeric: tabular-nums;
+        font-feature-settings: 'tnum' 1, 'ss01' 1;
+      }
+
+      main {
+        color: var(--institution-anthracite);
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        color: var(--institution-navy);
+        letter-spacing: -0.03em;
+      }
+
+      table,
+      [role='table'] {
+        font-variant-numeric: tabular-nums;
+        font-feature-settings: 'tnum' 1;
+      }
+
+      input,
+      textarea,
+      select {
+        font-family: 'Inter', sans-serif;
+        color: var(--institution-anthracite);
+        background: rgba(248, 249, 250, 0.95);
+        border-color: var(--institution-border);
+        box-shadow: inset 0 1px 2px rgba(26, 35, 126, 0.04);
+      }
+
+      input::placeholder,
+      textarea::placeholder {
+        color: rgba(69, 90, 100, 0.7);
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: rgba(26, 35, 126, 0.45);
+        box-shadow:
+          0 0 0 3px rgba(26, 35, 126, 0.08),
+          inset 0 1px 2px rgba(26, 35, 126, 0.05);
+      }
+
+      label {
+        color: var(--institution-anthracite);
+        font-weight: 600;
+      }
+
+      .rounded-\[2rem\],
+      .rounded-\[1\.5rem\],
+      .rounded-2xl,
+      .rounded-xl {
+        backdrop-filter: blur(8px);
+      }
+
+      .shadow-sm,
+      .shadow-md,
+      .shadow-lg,
+      .shadow-xl,
+      .shadow-institution {
+        box-shadow: 0 16px 42px -28px rgba(26, 35, 126, 0.28);
+      }
+
+      .ring-slate-200,
+      .border-slate-200,
+      .border-slate-300,
+      .border-stone-200 {
+        border-color: var(--institution-border) !important;
+      }
+
+      .bg-white {
+        background-color: var(--institution-surface) !important;
+      }
+
+      .text-slate-900,
+      .text-state-navy {
+        color: var(--institution-navy) !important;
+      }
+
+      .text-slate-600,
+      .text-slate-500,
+      .text-slate-400,
+      .text-state-body {
+        color: var(--institution-anthracite) !important;
+      }
+
+      .text-accent-400,
+      .text-accent-500 {
+        color: var(--institution-gold) !important;
+      }
+
+      .text-success-500,
+      .text-emerald-700 {
+        color: var(--institution-success) !important;
+      }
+
+      .bg-slate-50,
+      .bg-stone-50,
+      .bg-blue-50 {
+        background-color: rgba(248, 249, 250, 0.96) !important;
+      }
+
+      .bg-emerald-50 {
+        background-color: rgba(46, 125, 50, 0.08) !important;
+      }
+
+      .bg-blue-100 {
+        background-color: rgba(26, 35, 126, 0.08) !important;
+      }
+
+      .tracking-\[0\.2em\],
+      .tracking-\[0\.24em\],
+      .tracking-\[0\.25em\] {
+        letter-spacing: 0.18em !important;
       }
     </style>
     <title>Tarification Bancaire</title>

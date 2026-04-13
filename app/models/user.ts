@@ -40,7 +40,7 @@ export default class User extends AuthFinderUser {
   // Relation : le compte BANK appartient a une seule banque
   @belongsTo(() => Bank)
   declare bank: BelongsTo<typeof Bank>
-  
+
   // Relation : tarifs soumis par cet utilisateur
   @hasMany(() => Tariff, { foreignKey: 'submittedBy' })
   declare submittedTariffs: HasMany<typeof Tariff>

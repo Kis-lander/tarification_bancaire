@@ -18,14 +18,14 @@ export default class AnalyticsService {
       // 2. Formater les données pour le frontend
       return data.map((item) => ({
         // .toISODate() retourne "YYYY-MM-DD"
-        date: item.createdAt.toISODate(), 
+        date: item.createdAt.toISODate(),
         amount: item.amount,
-        currency: item.currency // Optionnel : utile si tu gères plusieurs devises
+        currency: item.currency, // Optionnel : utile si tu gères plusieurs devises
       }))
     } catch (error) {
       // 3. Gestion d'erreur si la base de données est injoignable ou crash
-      throw new Exception('Impossible de générer les données analytiques', { 
-        status: 500 
+      throw new Exception('Impossible de générer les données analytiques', {
+        status: 500,
       })
     }
   }

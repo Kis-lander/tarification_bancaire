@@ -63,7 +63,8 @@ export default class BccTariffReviewsController {
         successMessage = 'Tarif approuve avec succes et email envoye a la banque.'
       } catch (error) {
         console.error('Unable to send tariff approval email', error)
-        successMessage = 'Tarif approuve avec succes, mais lemail na pas pu etre envoye a la banque.'
+        successMessage =
+          'Tarif approuve avec succes, mais lemail na pas pu etre envoye a la banque.'
       }
     }
 

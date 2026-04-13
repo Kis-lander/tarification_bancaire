@@ -1,3 +1,5 @@
+import { readdirSync } from 'node:fs'
+import { join } from 'node:path'
 import { assert } from '@japa/assert'
 import app from '@adonisjs/core/services/app'
 import type { Config } from '@japa/runner/types'
@@ -16,13 +18,35 @@ import { sessionBrowserClient } from '@adonisjs/session/plugins/browser_client'
  * Configure Japa plugins in the plugins array.
  * Learn more - https://japa.dev/docs/runner-config#plugins-optional
  */
+function hasBrowserTests(directoryPath: string): boolean {
+  try {
+    const entries = readdirSync(directoryPath, { withFileTypes: true })
+
+    return entries.some((entry) => {
+      if (entry.isDirectory()) {
+        return hasBrowserTests(join(directoryPath, entry.name))
+      }
+
+      return entry.isFile() && entry.name.endsWith('.spec.ts')
+    })
+  } catch {
+    return false
+  }
+}
+
+const browserTestsEnabled = hasBrowserTests(join(process.cwd(), 'tests', 'browser'))
+
 export const plugins: Config['plugins'] = [
   assert(),
   pluginAdonisJS(app),
   dbAssertions(app),
-  browserClient({ runInSuites: ['browser'] }),
-  sessionBrowserClient(app),
-  authBrowserClient(app),
+  ...(browserTestsEnabled
+    ? [
+        browserClient({ runInSuites: ['browser'] }),
+        sessionBrowserClient(app),
+        authBrowserClient(app),
+      ]
+    : []),
 ]
 
 /**

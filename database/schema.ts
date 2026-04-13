@@ -8,7 +8,16 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class AgencySchema extends BaseModel {
-  static $columns = ['address', 'bankId', 'city', 'createdAt', 'id', 'latitude', 'longitude', 'updatedAt'] as const
+  static $columns = [
+    'address',
+    'bankId',
+    'city',
+    'createdAt',
+    'id',
+    'latitude',
+    'longitude',
+    'updatedAt',
+  ] as const
   $columns = AgencySchema.$columns
   @column()
   declare address: string
@@ -29,7 +38,18 @@ export class AgencySchema extends BaseModel {
 }
 
 export class AuthAccessTokenSchema extends BaseModel {
-  static $columns = ['abilities', 'createdAt', 'expiresAt', 'hash', 'id', 'lastUsedAt', 'name', 'tokenableId', 'type', 'updatedAt'] as const
+  static $columns = [
+    'abilities',
+    'createdAt',
+    'expiresAt',
+    'hash',
+    'id',
+    'lastUsedAt',
+    'name',
+    'tokenableId',
+    'type',
+    'updatedAt',
+  ] as const
   $columns = AuthAccessTokenSchema.$columns
   @column()
   declare abilities: string
@@ -54,7 +74,18 @@ export class AuthAccessTokenSchema extends BaseModel {
 }
 
 export class BankSignupVerificationSchema extends BaseModel {
-  static $columns = ['addresses', 'bankDescription', 'bankName', 'createdAt', 'email', 'id', 'otpCode', 'otpExpiresAt', 'password', 'updatedAt'] as const
+  static $columns = [
+    'addresses',
+    'bankDescription',
+    'bankName',
+    'createdAt',
+    'email',
+    'id',
+    'otpCode',
+    'otpExpiresAt',
+    'password',
+    'updatedAt',
+  ] as const
   $columns = BankSignupVerificationSchema.$columns
   @column()
   declare addresses: string | null
@@ -113,7 +144,16 @@ export class BccUserSchema extends BaseModel {
 }
 
 export class PendingBankRegistrationSchema extends BaseModel {
-  static $columns = ['addresses', 'bankDescription', 'bankName', 'createdAt', 'email', 'id', 'password', 'updatedAt'] as const
+  static $columns = [
+    'addresses',
+    'bankDescription',
+    'bankName',
+    'createdAt',
+    'email',
+    'id',
+    'password',
+    'updatedAt',
+  ] as const
   $columns = PendingBankRegistrationSchema.$columns
   @column()
   declare addresses: string | null
@@ -134,7 +174,15 @@ export class PendingBankRegistrationSchema extends BaseModel {
 }
 
 export class ServiceCategorySchema extends BaseModel {
-  static $columns = ['code', 'createdAt', 'description', 'id', 'isActive', 'name', 'updatedAt'] as const
+  static $columns = [
+    'code',
+    'createdAt',
+    'description',
+    'id',
+    'isActive',
+    'name',
+    'updatedAt',
+  ] as const
   $columns = ServiceCategorySchema.$columns
   @column()
   declare code: string
@@ -153,7 +201,16 @@ export class ServiceCategorySchema extends BaseModel {
 }
 
 export class ServiceSchema extends BaseModel {
-  static $columns = ['categoryId', 'code', 'createdAt', 'description', 'id', 'isActive', 'name', 'updatedAt'] as const
+  static $columns = [
+    'categoryId',
+    'code',
+    'createdAt',
+    'description',
+    'id',
+    'isActive',
+    'name',
+    'updatedAt',
+  ] as const
   $columns = ServiceSchema.$columns
   @column()
   declare categoryId: number | null
@@ -174,7 +231,20 @@ export class ServiceSchema extends BaseModel {
 }
 
 export class TariffSchema extends BaseModel {
-  static $columns = ['amount', 'approvedAt', 'approvedBy', 'bankId', 'createdAt', 'currency', 'id', 'rejectionReason', 'serviceId', 'status', 'submittedBy', 'updatedAt'] as const
+  static $columns = [
+    'amount',
+    'approvedAt',
+    'approvedBy',
+    'bankId',
+    'createdAt',
+    'currency',
+    'id',
+    'rejectionReason',
+    'serviceId',
+    'status',
+    'submittedBy',
+    'updatedAt',
+  ] as const
   $columns = TariffSchema.$columns
   @column()
   declare amount: string
@@ -203,7 +273,16 @@ export class TariffSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['addresses', 'bankId', 'createdAt', 'email', 'id', 'password', 'rule', 'updatedAt'] as const
+  static $columns = [
+    'addresses',
+    'bankId',
+    'createdAt',
+    'email',
+    'id',
+    'password',
+    'rule',
+    'updatedAt',
+  ] as const
   $columns = UserSchema.$columns
   @column()
   declare addresses: string | null

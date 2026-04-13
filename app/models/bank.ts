@@ -7,33 +7,33 @@ import { BankSchema } from '#database/schema'
 import Tariff from '#models/tariff'
 
 export default class Bank extends BankSchema {
-    static table = 'banks'
+  static table = 'banks'
 
-    @column({ isPrimary: true })
-    declare id: number
+  @column({ isPrimary: true })
+  declare id: number
 
-    @column()
-    declare name: string
+  @column()
+  declare name: string
 
-    @column()
-    declare description: string | null
+  @column()
+  declare description: string | null
 
-    @column()
-    declare isActive: boolean
+  @column()
+  declare isActive: boolean
 
-    // relations
-    @hasMany(() => User)
-    declare users: HasMany<typeof User>
+  // relations
+  @hasMany(() => User)
+  declare users: HasMany<typeof User>
 
-    @hasMany(() => Tariff)
-    declare tariffs: HasMany<typeof Tariff>
+  @hasMany(() => Tariff)
+  declare tariffs: HasMany<typeof Tariff>
 
-    @hasMany(() => Agency)
-    declare agencies: HasMany<typeof Agency>
+  @hasMany(() => Agency)
+  declare agencies: HasMany<typeof Agency>
 
-    @column.dateTime({ autoCreate: true })
-    declare createdAt: DateTime
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
 
-    @column.dateTime({ autoCreate: true, autoUpdate: true })
-    declare updatedAt: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
 }

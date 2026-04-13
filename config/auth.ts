@@ -16,7 +16,7 @@ const authConfig = defineConfig({
         model: () => import('#models/user'),
       }),
     }),
-    
+
     // Guard dédié au BCC
     bcc: sessionGuard({
       useRememberMeTokens: false,

@@ -26,4 +26,3 @@ export default class BccServicesController {
     return response.redirect('/bcc/services')
   }
 }
-

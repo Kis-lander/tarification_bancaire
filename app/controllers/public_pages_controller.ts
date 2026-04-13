@@ -22,14 +22,27 @@ export default class PublicPagesController {
   }
 
   async home({ view }: HttpContext) {
-    const [banksCount, agenciesCount, servicesCount, approvedTariffs, latestBanks, pendingBankRegistrations, pendingTariffs] = await Promise.all([
+    const [
+      banksCount,
+      agenciesCount,
+      servicesCount,
+      approvedTariffs,
+      latestBanks,
+      pendingBankRegistrations,
+      pendingTariffs,
+    ] = await Promise.all([
       Bank.query().where('isActive', true).count('* as total'),
       Agency.query().count('* as total'),
       Service.query().where('isActive', true).count('* as total'),
       Tariff.query().where('status', 'APPROVED').count('* as total'),
       Bank.query().where('isActive', true).orderBy('createdAt', 'desc').limit(4),
       PendingBankRegistration.query().orderBy('createdAt', 'desc').limit(5),
-      Tariff.query().where('status', 'PENDING').preload('bank').preload('service').orderBy('createdAt', 'desc').limit(5),
+      Tariff.query()
+        .where('status', 'PENDING')
+        .preload('bank')
+        .preload('service')
+        .orderBy('createdAt', 'desc')
+        .limit(5),
     ])
 
     return view.render('pages/home', {
@@ -50,7 +63,10 @@ export default class PublicPagesController {
   }
 
   async banks({ view }: HttpContext) {
-    const banks = await Bank.query().where('isActive', true).preload('agencies').orderBy('name', 'asc')
+    const banks = await Bank.query()
+      .where('isActive', true)
+      .preload('agencies')
+      .orderBy('name', 'asc')
 
     return view.render('pages/banks', { banks })
   }

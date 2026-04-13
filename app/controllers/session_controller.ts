@@ -41,13 +41,19 @@ export default class SessionController {
         ])
 
         if (pendingVerification) {
-          session.flash('error', 'Votre inscription est en cours de verification OTP. Consultez votre email puis validez le code recu.')
+          session.flash(
+            'error',
+            'Votre inscription est en cours de verification OTP. Consultez votre email puis validez le code recu.'
+          )
           session.flash('email', email)
           return response.redirect('/signup/verify')
         }
 
         if (pendingRegistration) {
-          session.flash('error', 'Votre demande de compte banque a bien ete recue et reste en attente de validation par la BCC.')
+          session.flash(
+            'error',
+            'Votre demande de compte banque a bien ete recue et reste en attente de validation par la BCC.'
+          )
           session.flash('email', email)
           return response.redirect().back()
         }
@@ -85,7 +91,10 @@ export default class SessionController {
     await auth.use('web').login(user)
 
     if (user.rule === 'BANK' && !user.bankId) {
-      session.flash('error', 'Votre compte BANK est connecte, mais il nest rattache a aucune banque. Veuillez demander a la BCC de vous affecter une banque.')
+      session.flash(
+        'error',
+        'Votre compte BANK est connecte, mais il nest rattache a aucune banque. Veuillez demander a la BCC de vous affecter une banque.'
+      )
       return response.redirect().toRoute('home')
     }
 

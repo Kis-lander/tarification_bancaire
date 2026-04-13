@@ -8,9 +8,40 @@ type HttpErrorLike = {
   message?: string
 }
 
+type ParsedAddress = {
+  city: string
+  country: string
+  normalizedAddress: string
+}
+
 @inject()
 export default class AgenciesController {
   constructor(protected agencyService: AgencyService) {}
+
+  private parseBankAddress(rawAddress: string | null | undefined): ParsedAddress | null {
+    const value = (rawAddress || '').trim()
+    if (!value) {
+      return null
+    }
+
+    const parts = value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+
+    if (parts.length < 2) {
+      return null
+    }
+
+    const city = parts[0]
+    const country = parts.slice(1).join(', ')
+
+    return {
+      city,
+      country,
+      normalizedAddress: `${city}, ${country}`,
+    }
+  }
 
   async index({ response }: HttpContext) {
     try {
@@ -89,7 +120,10 @@ export default class AgenciesController {
   async map({ request, response }: HttpContext) {
     const { bankId } = request.qs()
 
-    let bankUsersQuery = User.query().where('rule', 'BANK').whereNotNull('addresses').preload('bank')
+    let bankUsersQuery = User.query()
+      .where('rule', 'BANK')
+      .whereNotNull('addresses')
+      .preload('bank')
 
     if (bankId) {
       bankUsersQuery = bankUsersQuery.where('bank_id', bankId)
@@ -97,44 +131,37 @@ export default class AgenciesController {
 
     const bankUsers = await bankUsersQuery
 
-    const uniqueBankLocations = new Map<string, {
-      id: number
-      bank: string
-      city: string
-      country: string
-      address: string
-      searchQuery: string
-      sourceLabel: string
-    }>()
+    const uniqueBankLocations = new Map<
+      string,
+      {
+        id: number
+        bankId: number
+        bank: string
+        city: string
+        country: string
+        address: string
+        searchQuery: string
+        sourceLabel: string
+      }
+    >()
 
     bankUsers.forEach((user) => {
-      const rawAddress = (user.addresses || '').trim()
-      if (!rawAddress) {
+      const parsedAddress = this.parseBankAddress(user.addresses)
+      if (!parsedAddress || !user.bankId) {
         return
       }
-
-      const parts = rawAddress
-        .split(',')
-        .map((item) => item.trim())
-        .filter(Boolean)
-
-      if (parts.length < 2) {
-        return
-      }
-
-      const city = parts[0]
-      const country = parts.slice(1).join(', ')
       const bankName = user.bank?.name || 'Banque inconnue'
-      const key = `${bankName.toLowerCase()}::${city.toLowerCase()}::${country.toLowerCase()}`
+      const key = `${user.bankId}::${parsedAddress.city.toLowerCase()}::${parsedAddress.country.toLowerCase()}`
 
       if (!uniqueBankLocations.has(key)) {
         uniqueBankLocations.set(key, {
-          id: user.id,
+          id: user.bankId,
+          bankId: user.bankId,
           bank: bankName,
-          city,
-          country,
-          address: `${city}, ${country}`,
-          searchQuery: `${bankName}, ${country}`,
+          city: parsedAddress.city,
+          country: parsedAddress.country,
+          address: parsedAddress.normalizedAddress,
+          searchQuery: `${bankName}, ${parsedAddress.country}`,
           sourceLabel: 'Ville et pays declares par la banque',
         })
       }

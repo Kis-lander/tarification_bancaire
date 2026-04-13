@@ -10,7 +10,13 @@ export default class extends BaseSchema {
       table.string('password').notNullable()
       table.string('rule').nullable()
       // Relation avec bank
-      table.integer('bank_id').unsigned().references('id').inTable('banks').onDelete('CASCADE').onUpdate('CASCADE')
+      table
+        .integer('bank_id')
+        .unsigned()
+        .references('id')
+        .inTable('banks')
+        .onDelete('CASCADE')
+        .onUpdate('CASCADE')
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()
     })

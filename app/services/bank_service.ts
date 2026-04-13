@@ -41,7 +41,10 @@ export default class BankService {
   /**
    * Mettre a jour une banque
    */
-  async updateBank(id: number, data: { name?: string; description?: string | null; isActive?: boolean }) {
+  async updateBank(
+    id: number,
+    data: { name?: string; description?: string | null; isActive?: boolean }
+  ) {
     const bank = await this.findById(id)
 
     try {

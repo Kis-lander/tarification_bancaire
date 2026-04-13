@@ -13,20 +13,23 @@ export default class BankTariffsController {
 
     const [services, tariffs] = await Promise.all([
       Service.query().where('isActive', true).orderBy('name', 'asc'),
-      Tariff.query()
-        .where('bankId', user.bankId)
-        .preload('service')
-        .orderBy('createdAt', 'desc'),
+      Tariff.query().where('bankId', user.bankId).preload('service').orderBy('createdAt', 'desc'),
     ])
 
     const latestApprovedTariffs = tariffs.filter(
       (tariff, index, items) =>
-        tariff.status === 'APPROVED' && items.findIndex((item) => item.serviceId === tariff.serviceId && item.status === 'APPROVED') === index
+        tariff.status === 'APPROVED' &&
+        items.findIndex(
+          (item) => item.serviceId === tariff.serviceId && item.status === 'APPROVED'
+        ) === index
     )
 
     const latestPendingTariffs = tariffs.filter(
       (tariff, index, items) =>
-        tariff.status === 'PENDING' && items.findIndex((item) => item.serviceId === tariff.serviceId && item.status === 'PENDING') === index
+        tariff.status === 'PENDING' &&
+        items.findIndex(
+          (item) => item.serviceId === tariff.serviceId && item.status === 'PENDING'
+        ) === index
     )
 
     return view.render('pages/bank/tariffs', {
@@ -68,7 +71,10 @@ export default class BankTariffsController {
       existingPendingTariff.currency = data.currency || existingPendingTariff.currency || 'CDF'
       await existingPendingTariff.save()
 
-      session.flash('success', 'La demande de tarification en attente a ete mise a jour et reste soumise a la validation BCC.')
+      session.flash(
+        'success',
+        'La demande de tarification en attente a ete mise a jour et reste soumise a la validation BCC.'
+      )
       return response.redirect('/bank/tariffs')
     }
 
@@ -103,4 +109,3 @@ export default class BankTariffsController {
     return response.redirect('/bank/tariffs')
   }
 }
-

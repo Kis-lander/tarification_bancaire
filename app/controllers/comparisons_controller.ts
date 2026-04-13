@@ -27,7 +27,9 @@ export default class ComparisonsController {
   async compare({ request, response }: HttpContext) {
     try {
       const bankIds = this.normalizeIds(request.input('bankIds', request.input('bankIds[]', [])))
-      const serviceIds = this.normalizeIds(request.input('serviceIds', request.input('serviceIds[]', [])))
+      const serviceIds = this.normalizeIds(
+        request.input('serviceIds', request.input('serviceIds[]', []))
+      )
 
       if (bankIds.length === 0 || serviceIds.length === 0) {
         return response.badRequest({

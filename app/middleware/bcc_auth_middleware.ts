@@ -4,13 +4,13 @@ import type { NextFn } from '@adonisjs/core/types/http'
 export default class BccAuthMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
     /**
-     * 1. On force l'utilisation du guard 'bcc' 
+     * 1. On force l'utilisation du guard 'bcc'
      * Cela permet à TypeScript de savoir que l'utilisateur est un BccUser
      */
     const authenticator = ctx.auth.use('bcc')
 
     // 2. Vérification de l'authentification
-    if (!await authenticator.check()) {
+    if (!(await authenticator.check())) {
       ctx.session.flash('error', 'Accès restreint aux administrateurs BCC.')
       return ctx.response.redirect('/bcc/login')
     }

@@ -7,12 +7,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
 
-      table
-        .integer('bank_id')
-        .unsigned()
-        .references('id')
-        .inTable('banks')
-        .onDelete('CASCADE')
+      table.integer('bank_id').unsigned().references('id').inTable('banks').onDelete('CASCADE')
 
       table.string('city').notNullable()
       table.string('address').notNullable()
@@ -20,7 +15,7 @@ export default class extends BaseSchema {
       // 🔥 Géolocalisation
       table.decimal('latitude', 10, 7).notNullable()
       table.decimal('longitude', 10, 7).notNullable()
-      
+
       table.timestamp('created_at')
       table.timestamp('updated_at')
     })

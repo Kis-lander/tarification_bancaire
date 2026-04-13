@@ -15,7 +15,9 @@ export default class AgencyService {
     const bank = await Bank.findOrFail(data.bankId)
 
     if (bank.id !== bankId) {
-      throw new Exception("Acces refuse : vous n'etes pas autorise a gerer cette banque", { status: 403 })
+      throw new Exception("Acces refuse : vous n'etes pas autorise a gerer cette banque", {
+        status: 403,
+      })
     }
 
     try {

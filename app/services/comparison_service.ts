@@ -23,9 +23,7 @@ export default class ComparisonService {
         result[serviceId] = {}
 
         for (const bankId of bankIds) {
-          const tariff = tariffs.find(
-            (t) => t.bankId === bankId && t.serviceId === serviceId
-          )
+          const tariff = tariffs.find((t) => t.bankId === bankId && t.serviceId === serviceId)
 
           result[serviceId][bankId] = tariff ? tariff.amount : null
         }

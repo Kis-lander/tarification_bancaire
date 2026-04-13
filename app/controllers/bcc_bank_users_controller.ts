@@ -44,7 +44,9 @@ export default class BccBankUsersController {
   async approve({ params, response, session }: HttpContext) {
     const registration = await PendingBankRegistration.findOrFail(params.id)
 
-    const existingBank = await Bank.query().whereRaw('LOWER(name) = LOWER(?)', [registration.bankName]).first()
+    const existingBank = await Bank.query()
+      .whereRaw('LOWER(name) = LOWER(?)', [registration.bankName])
+      .first()
 
     const bank =
       existingBank ||
@@ -54,7 +56,11 @@ export default class BccBankUsersController {
         isActive: true,
       }))
 
-    if (existingBank && registration.bankDescription && existingBank.description !== registration.bankDescription) {
+    if (
+      existingBank &&
+      registration.bankDescription &&
+      existingBank.description !== registration.bankDescription
+    ) {
       existingBank.description = registration.bankDescription
       await existingBank.save()
     }
@@ -74,7 +80,11 @@ export default class BccBankUsersController {
     })
 
     await registration.delete()
-    await this.emailService.sendBankApprovalDecision(registration.email, registration.bankName, true)
+    await this.emailService.sendBankApprovalDecision(
+      registration.email,
+      registration.bankName,
+      true
+    )
 
     session.flash('success', 'Demande BANK approuvee avec succes.')
     return response.redirect('/bcc/bank-users')
@@ -82,11 +92,14 @@ export default class BccBankUsersController {
 
   async reject({ params, response, session }: HttpContext) {
     const registration = await PendingBankRegistration.findOrFail(params.id)
-    await this.emailService.sendBankApprovalDecision(registration.email, registration.bankName, false)
+    await this.emailService.sendBankApprovalDecision(
+      registration.email,
+      registration.bankName,
+      false
+    )
     await registration.delete()
 
     session.flash('success', 'Demande BANK invalidee et supprimee.')
     return response.redirect('/bcc/bank-users')
   }
 }
-

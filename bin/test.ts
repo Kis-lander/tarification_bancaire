@@ -13,6 +13,7 @@
 process.env.NODE_ENV = 'test'
 
 import 'reflect-metadata'
+import { createServer } from 'node:net'
 import { Ignitor, prettyPrintError } from '@adonisjs/core'
 import { configure, processCLIArgs, run } from '@japa/runner'
 
@@ -31,6 +32,31 @@ const IMPORTER = (filePath: string) => {
     return import(new URL(filePath, APP_ROOT).href)
   }
   return import(filePath)
+}
+
+const reserveOpenPort = async (): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const server = createServer()
+
+    server.once('error', reject)
+    server.listen(0, '127.0.0.1', () => {
+      const address = server.address()
+      const port = typeof address === 'object' && address ? String(address.port) : '24679'
+
+      server.close((error) => {
+        if (error) {
+          reject(error)
+          return
+        }
+
+        resolve(port)
+      })
+    })
+  })
+}
+
+if (!process.env.VITE_HMR_PORT) {
+  process.env.VITE_HMR_PORT = await reserveOpenPort()
 }
 
 new Ignitor(APP_ROOT, { importer: IMPORTER })

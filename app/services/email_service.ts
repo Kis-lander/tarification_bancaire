@@ -61,7 +61,7 @@ export default class EmailService {
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${this.apiKey}`,
+        'Authorization': `Bearer ${this.apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -119,7 +119,9 @@ export default class EmailService {
     approved: boolean,
     rejectionReason?: string | null
   ) {
-    const subject = approved ? 'Votre tarif a ete approuve par la BCC' : 'Votre tarif a ete rejete par la BCC'
+    const subject = approved
+      ? 'Votre tarif a ete approuve par la BCC'
+      : 'Votre tarif a ete rejete par la BCC'
     const text = approved
       ? `La BCC a approuve le tarif ${serviceName} de ${bankName} pour ${amount} ${currency}.`
       : `La BCC a rejete le tarif ${serviceName} de ${bankName} pour ${amount} ${currency}. Motif: ${rejectionReason || 'Tarif rejete par la BCC.'}`

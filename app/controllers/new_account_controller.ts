@@ -12,6 +12,15 @@ import { randomInt } from 'node:crypto'
 export default class NewAccountController {
   constructor(protected emailService: EmailService) {}
 
+  private normalizeCityCountryAddress(address: string) {
+    return address
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .slice(0, 2)
+      .join(', ')
+  }
+
   async create({ view }: HttpContext) {
     return view.render('pages/auth/signup')
   }
@@ -32,7 +41,7 @@ export default class NewAccountController {
     const payload = await request.validateUsing(bankSignupValidator)
     const normalizedEmail = payload.email.trim().toLowerCase()
     const otp = String(randomInt(100000, 1000000))
-    const normalizedAddresses = payload.addresses.trim()
+    const normalizedAddresses = this.normalizeCityCountryAddress(payload.addresses)
 
     const verification = await BankSignupVerification.firstOrNew({ email: normalizedEmail })
     verification.email = normalizedEmail
