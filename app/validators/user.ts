@@ -37,3 +37,16 @@ export const bccBankUserValidator = vine.create({
     confirmationField: 'passwordConfirmation',
   }),
 })
+
+export const bankAccountUpdateValidator = vine.create({
+  email: email(),
+  bankName: vine.string().trim().minLength(2).maxLength(255),
+  bankDescription: vine.string().trim().maxLength(2000).optional(),
+  addresses: vine
+    .string()
+    .trim()
+    .maxLength(200)
+    .regex(/^[^,]+,\s*[^,]+$/),
+  oldPassword: vine.string().trim().maxLength(32).optional(),
+  newPassword: vine.string().trim().minLength(8).maxLength(32).optional(),
+})

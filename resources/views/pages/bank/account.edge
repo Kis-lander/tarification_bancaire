@@ -1,0 +1,106 @@
+@layout('layouts/main')
+
+  <section class="mx-auto max-w-4xl rounded-[2rem] border border-institution-800/10 bg-white p-6 shadow-sm sm:p-8">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-[0.25em] text-accent-500">Espace Banque</p>
+        <h1 class="mt-2 text-3xl font-black text-state-navy">Modifier mon compte</h1>
+        <p class="mt-3 max-w-2xl text-sm leading-6 text-state-body">
+          Mettez à jour les informations de votre banque, votre adresse de contact et, si nécessaire, votre mot de passe.
+        </p>
+      </div>
+      <span class="data-mono rounded-full bg-institution-100 px-3 py-1 text-xs font-semibold text-institution-800">
+        BANK ID {{ bank.id }}
+      </span>
+    </div>
+
+    <form action="/bank/account" method="POST" class="mt-8 grid gap-5 md:grid-cols-2">
+      {{ csrfField() }}
+
+      <div class="md:col-span-2">
+        <label for="bank-account-bank-name" class="mb-2 block text-sm font-bold text-slate-900">Nom de la banque</label>
+        <input
+          id="bank-account-bank-name"
+          name="bankName"
+          type="text"
+          value="{{ old('bankName', bank.name) }}"
+          required
+          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-state-navy"
+        />
+      </div>
+
+      <div class="md:col-span-2">
+        <label for="bank-account-description" class="mb-2 block text-sm font-bold text-slate-900">Description de la banque</label>
+        <textarea
+          id="bank-account-description"
+          name="bankDescription"
+          rows="4"
+          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-state-navy"
+        >{{ old('bankDescription', bank.description || '') }}</textarea>
+      </div>
+
+      <div class="md:col-span-2">
+        <label for="bank-account-email" class="mb-2 block text-sm font-bold text-slate-900">Adresse email du compte</label>
+        <input
+          id="bank-account-email"
+          name="email"
+          type="email"
+          value="{{ old('email', account.email) }}"
+          required
+          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-state-navy"
+        />
+      </div>
+
+      <div class="md:col-span-2">
+        <label for="bank-account-address" class="mb-2 block text-sm font-bold text-slate-900">Ville et pays</label>
+        <input
+          id="bank-account-address"
+          name="addresses"
+          type="text"
+          value="{{ old('addresses', account.addresses || '') }}"
+          required
+          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-state-navy"
+          placeholder="Kinshasa, RDC"
+        />
+        <p class="mt-2 text-xs text-slate-500">Format requis: Ville, Pays.</p>
+      </div>
+
+      <div>
+        <label for="bank-account-old-password" class="mb-2 block text-sm font-bold text-slate-900">Ancien mot de passe</label>
+        <input
+          id="bank-account-old-password"
+          name="oldPassword"
+          type="password"
+          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-state-navy"
+          placeholder="Mot de passe actuel"
+        />
+      </div>
+
+      <div>
+        <label for="bank-account-new-password" class="mb-2 block text-sm font-bold text-slate-900">Nouveau mot de passe</label>
+        <input
+          id="bank-account-new-password"
+          name="newPassword"
+          type="password"
+          class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-state-navy"
+          placeholder="Minimum 8 caracteres"
+        />
+      </div>
+
+      <div class="md:col-span-2 grid gap-3 sm:grid-cols-2">
+        <button
+          type="submit"
+          class="w-full rounded-xl border border-stone-300 bg-blue-100 px-5 py-3 text-sm font-bold text-state-navy shadow-sm transition hover:border-blue-500 hover:bg-blue-200 hover:text-state-navy"
+        >
+          Enregistrer
+        </button>
+        <a
+          href="/bank/tariffs"
+          class="w-full rounded-xl border border-slate-300 bg-white px-5 py-3 text-center text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50"
+        >
+          Annuler
+        </a>
+      </div>
+    </form>
+  </section>
+@end

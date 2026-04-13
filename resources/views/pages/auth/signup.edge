@@ -1,10 +1,10 @@
 @layout('layouts/main')
 
   <section class="mx-auto max-w-2xl rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8">
-    <p class="text-sm font-semibold uppercase tracking-[0.25em] text-blue-600">Creation de compte</p>
+    <p class="text-sm font-semibold uppercase tracking-[0.25em] text-blue-600">Création de compte</p>
     <h1 class="mt-2 text-3xl font-black text-slate-900">Demande de compte BANK</h1>
     <p class="mt-3 text-sm leading-6 text-slate-600">
-      Renseignez votre banque et vos informations de contact. La BCC devra d'abord valider votre demande avant la creation effective du compte.
+      Renseignez votre banque et vos informations de contact. La BCC devra d'abord valider votre demande avant la création effective du compte.
     </p>
 
     @if(Object.keys(flashMessages.get('inputErrorsBag', {})).length)
@@ -110,7 +110,7 @@
           type="submit"
           class="w-full rounded-xl border border-stone-300 bg-blue-100 px-5 py-3 text-sm font-bold text-state-navy shadow-sm transition hover:border-blue-500 hover:bg-blue-200 hover:text-state-navy"
         >
-          Envoyer la demande a la BCC
+          Envoyer la demande à la BCC
         </button>
       </div>
     </form>

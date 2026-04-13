@@ -145,4 +145,22 @@ export default class EmailService {
 
     await this.sendEmail(to, subject, html, text)
   }
+
+  async sendBankAccountUpdated(to: string, bankName: string, updatedFields: string[]) {
+    const subject = 'Les informations de votre banque ont ete modifiees'
+    const text = `Les informations de la banque ${bankName} ont ete mises a jour. Champs modifies: ${updatedFields.join(', ')}.`
+    const html = `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a;">
+        <h2>Mise a jour du compte banque</h2>
+        <p>Les informations de la banque <strong>${bankName}</strong> viennent d etre modifiees.</p>
+        <p>Elements mis a jour :</p>
+        <ul>
+          ${updatedFields.map((field) => `<li>${field}</li>`).join('')}
+        </ul>
+        <p>Si vous n etes pas a l origine de cette modification, veuillez contacter la BCC immediatement.</p>
+      </div>
+    `
+
+    await this.sendEmail(to, subject, html, text)
+  }
 }

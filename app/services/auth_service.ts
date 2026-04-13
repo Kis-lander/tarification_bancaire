@@ -61,9 +61,5 @@ export default class AuthService {
     } catch {
       throw new Exception('Erreur lors de la deconnexion', { status: 500 })
     }
-<<<<<<< ours
-  } 
-=======
   }
->>>>>>> theirs
 }

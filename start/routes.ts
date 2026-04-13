@@ -1,6 +1,7 @@
 import { controllers } from '#generated/controllers'
 const AgenciesController = () => import('#controllers/agencies_controller')
 const AnalyticsController = () => import('#controllers/analytic_controller')
+const BankAccountController = () => import('#controllers/bank_account_controller')
 const BankTariffsController = () => import('#controllers/bank_tariffs_controller')
 const BanksController = () => import('#controllers/banks_controller')
 const BccBankUsersController = () => import('#controllers/bcc_bank_users_controller')
@@ -87,6 +88,9 @@ router
 
 router
   .group(() => {
+    router.get('/bank/account', [BankAccountController, 'edit']).as('bank.account.edit')
+    router.post('/bank/account', [BankAccountController, 'update']).as('bank.account.update')
+
     router.get('/bank/tariffs', [BankTariffsController, 'index']).as('bank.tariffs')
     router.post('/bank/tariffs', [BankTariffsController, 'store']).as('bank.tariffs.store')
     router

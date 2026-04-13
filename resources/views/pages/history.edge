@@ -3,16 +3,16 @@
   <section class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
     <div class="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8">
       <p class="text-sm font-semibold uppercase tracking-[0.25em] text-blue-600">Historique</p>
-      <h1 class="mt-2 text-3xl font-black text-slate-900">Suivre l'evolution des tarifs</h1>
+      <h1 class="mt-2 text-3xl font-black text-slate-900">Suivre l'évolution des tarifs</h1>
       <p class="mt-3 text-sm leading-6 text-slate-600">
-        Choisissez une banque et un service pour consulter l'historique des montants enregistres dans le temps.
+        Choisissez une banque et un service pour consulter l'historique des montants enregistrés dans le temps.
       </p>
 
       <form id="history-form" class="mt-8 space-y-5">
         <div>
           <label for="history-bank" class="mb-2 block text-sm font-bold text-slate-900">Banque</label>
           <select id="history-bank" name="bankId" class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-500">
-            <option value="">Selectionnez une banque</option>
+            <option value="">Sélectionnez une banque</option>
             @each(bank in banks)
               <option value="{{ bank.id }}">{{ bank.name }}</option>
             @endeach
@@ -26,7 +26,7 @@
             name="serviceId"
             class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-500"
           >
-            <option value="">Selectionnez un service</option>
+            <option value="">Sélectionnez un service</option>
             @each(service in services)
               <option value="{{ service.id }}">{{ service.name }} - {{ service.category ? service.category.name : 'Sans categorie' }}</option>
             @endeach
@@ -50,7 +50,7 @@
 
       <div id="history-results" class="mt-8 grid gap-4">
         <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm text-slate-500">
-          Selectionnez des filtres pour afficher l'historique des tarifs.
+          Sélectionnez des filtres pour afficher l'historique des tarifs.
         </div>
       </div>
     </div>

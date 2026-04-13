@@ -41,6 +41,8 @@ export type ScannedRoutes = {
     'bcc.tariffReviews': { paramsTuple?: []; params?: {} }
     'bcc.tariffReviews.approve': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bcc.tariffReviews.reject': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bank.account.edit': { paramsTuple?: []; params?: {} }
+    'bank.account.update': { paramsTuple?: []; params?: {} }
     'bank.tariffs': { paramsTuple?: []; params?: {} }
     'bank.tariffs.store': { paramsTuple?: []; params?: {} }
     'bank.tariffs.update.post': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -74,6 +76,7 @@ export type ScannedRoutes = {
     'bcc.services': { paramsTuple?: []; params?: {} }
     'bcc.bankUsers': { paramsTuple?: []; params?: {} }
     'bcc.tariffReviews': { paramsTuple?: []; params?: {} }
+    'bank.account.edit': { paramsTuple?: []; params?: {} }
     'bank.tariffs': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
@@ -100,6 +103,7 @@ export type ScannedRoutes = {
     'bcc.services': { paramsTuple?: []; params?: {} }
     'bcc.bankUsers': { paramsTuple?: []; params?: {} }
     'bcc.tariffReviews': { paramsTuple?: []; params?: {} }
+    'bank.account.edit': { paramsTuple?: []; params?: {} }
     'bank.tariffs': { paramsTuple?: []; params?: {} }
   }
   POST: {
@@ -117,6 +121,7 @@ export type ScannedRoutes = {
     'bcc.bankUsers.reject': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bcc.tariffReviews.approve': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bcc.tariffReviews.reject': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bank.account.update': { paramsTuple?: []; params?: {} }
     'bank.tariffs.store': { paramsTuple?: []; params?: {} }
     'bank.tariffs.update.post': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'tariffs.store': { paramsTuple?: []; params?: {} }
