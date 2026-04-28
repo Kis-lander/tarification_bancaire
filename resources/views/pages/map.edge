@@ -2,12 +2,12 @@
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-  <section class="grid gap-8 lg:grid-cols-[360px_minmax(0,1fr)]">
-    <div class="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8">
-      <p class="text-sm font-semibold uppercase tracking-[0.25em] text-blue-600">Géolocalisation</p>
+  <section class="grid gap-0 lg:grid-cols-[360px_minmax(0,1fr)] h-screen overflow-hidden">
+    <div class="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8 overflow-y-auto">
+      <p class="text-sm font-semibold uppercase tracking-[0.25em] text-blue-600">Geolocalisation</p>
       <h1 class="mt-2 text-3xl font-black text-slate-900">Carte des agences bancaires</h1>
       <p class="mt-3 text-sm leading-6 text-slate-600">
-        Choisissez une banque puis lancez la recherche. La carte parcourra automatiquement le pays déclaré par la banque pour retrouver ses agences et leurs adresses.
+        Choisissez une banque puis lancez la recherche. La carte affiche les agences enregistrees pour cette banque et peut ensuite les filtrer par territoire.
       </p>
 
       <form id="map-filter-form" class="mt-8 space-y-4">
@@ -18,11 +18,23 @@
             name="bankId"
             class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500"
           >
-            <option value="">Sélectionnez une banque</option>
+            <option value="">Selectionnez une banque</option>
             @each(bank in banks)
               <option value="{{ bank.id }}">{{ bank.name }}</option>
             @endeach
           </select>
+        </div>
+
+        <div>
+          <label for="territory-search" class="mb-2 block text-sm font-bold text-slate-900">Territoire</label>
+          <input
+            id="territory-search"
+            name="territorySearch"
+            type="text"
+            class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500"
+            placeholder="Pays, province, commune ou quartier"
+          />
+          <p class="mt-2 text-xs text-slate-500">Recherchez les agences par pays, province, commune ou quartier.</p>
         </div>
 
         <button type="submit" class="w-full rounded-xl border border-stone-300 bg-blue-100 px-5 py-3 text-sm font-bold text-state-navy shadow-sm transition hover:border-blue-500 hover:bg-blue-200 hover:text-state-navy">
@@ -36,14 +48,14 @@
       </div>
 
       <div id="map-summary" class="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-4 text-sm text-slate-500">
-        Sélectionnez une banque puis cliquez sur "Afficher les agences".
+        Selectionnez une banque puis cliquez sur "Afficher les agences".
       </div>
 
       <div id="map-list" class="mt-4 grid max-h-[480px] gap-3 overflow-y-auto pr-1"></div>
     </div>
 
-    <div class="rounded-[2rem] bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-6">
-      <div id="agencies-map" class="h-[620px] rounded-[1.5rem]"></div>
+    <div class="sticky top-0 h-screen rounded-[2rem] bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-6">
+      <div id="agencies-map" class="h-full rounded-[1.5rem]"></div>
     </div>
   </section>
 
@@ -54,20 +66,32 @@
     const mapCount = document.getElementById('map-count')
     const mapSummary = document.getElementById('map-summary')
     const bankSelect = document.getElementById('bankId')
-    const mapInstance = L.map('agencies-map').setView([7.9465, -1.0232], 6)
-    const markersLayer = L.layerGroup().addTo(mapInstance)
-    const markerIcon = L.icon({
-      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41],
-    })
+    const territorySearchInput = document.getElementById('territory-search')
+    const submitButton = mapForm?.querySelector('button[type="submit"]')
+    const leafletIsAvailable = typeof window.L !== 'undefined'
+    const mapInstance = leafletIsAvailable ? L.map('agencies-map').setView([7.9465, -1.0232], 6) : null
+    const markersLayer = leafletIsAvailable && mapInstance ? L.layerGroup().addTo(mapInstance) : null
+    const markerIcon =
+      leafletIsAvailable
+        ? L.icon({
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41],
+          })
+        : null
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors',
-    }).addTo(mapInstance)
+    if (leafletIsAvailable && mapInstance) {
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+      }).addTo(mapInstance)
+    }
+
+    let currentBank = null
+    let currentAgencies = []
+    let currentMarkers = []
 
     const escapeHtml = (value) =>
       String(value || '')
@@ -76,73 +100,6 @@
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;')
-
-    const geocodeAddress = async (address, options = {}) => {
-      const params = new URLSearchParams({
-        format: 'jsonv2',
-        limit: String(options.limit || 1),
-        q: address,
-      })
-
-      if (options.addressDetails) {
-        params.set('addressdetails', '1')
-      }
-
-      if (options.viewbox) {
-        params.set('viewbox', options.viewbox.join(','))
-        params.set('bounded', '1')
-      }
-
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?${params.toString()}`,
-        {
-          headers: {
-            Accept: 'application/json',
-          },
-        }
-      )
-
-      if (!response.ok) {
-        return null
-      }
-
-      const results = await response.json()
-      if (!Array.isArray(results) || !results.length) {
-        return null
-      }
-
-      return results
-    }
-
-    const getCountryBounds = async (bank) => {
-      const results = await geocodeAddress(bank.country, {
-        limit: 1,
-        addressDetails: true,
-      })
-
-      if (!results || !results.length) {
-        return null
-      }
-
-      const country = results[0]
-      const boundingbox = Array.isArray(country.boundingbox) ? country.boundingbox : null
-      if (!boundingbox || boundingbox.length !== 4) {
-        return null
-      }
-
-      const south = Number(boundingbox[0])
-      const north = Number(boundingbox[1])
-      const west = Number(boundingbox[2])
-      const east = Number(boundingbox[3])
-
-      return {
-        viewbox: [west, north, east, south],
-        leafletBounds: [
-          [south, west],
-          [north, east],
-        ],
-      }
-    }
 
     const dedupeAgencies = (agencies) => {
       const unique = new Map()
@@ -157,48 +114,17 @@
       return Array.from(unique.values())
     }
 
-    const searchBankAgencies = async (bank, countryBounds) => {
-      const searchQueries = [
-        bank.bank,
-        `${bank.bank} agence`,
-        `${bank.bank} branch`,
-        `${bank.bank} ${bank.city}`,
-      ]
+    const normalizeAgencyCoordinates = (agencies) =>
+      dedupeAgencies(
+        agencies.filter((agency) => Number.isFinite(agency.lat) && Number.isFinite(agency.lng))
+      )
 
-      const agencies = []
-
-      for (const query of searchQueries) {
-        const results = await geocodeAddress(query, {
-          limit: 20,
-          addressDetails: true,
-          viewbox: countryBounds?.viewbox,
-        })
-
-        if (!results || !results.length) {
-          continue
-        }
-
-        results.forEach((item) => {
-          const haystack = `${item.display_name || ''} ${item.name || ''}`.toLowerCase()
-          if (!haystack.includes(bank.bank.toLowerCase())) {
-            return
-          }
-
-          agencies.push({
-            id: `${bank.bankId}-${agencies.length + 1}`,
-            bank: bank.bank,
-            city: item.address?.city || item.address?.town || item.address?.village || item.address?.state || bank.city,
-            address: item.display_name || `${bank.city}, ${bank.country}`,
-            addressLines: [item.display_name || `${bank.city}, ${bank.country}`],
-            lat: Number(item.lat),
-            lng: Number(item.lon),
-            sourceLabel: 'Agence trouvee automatiquement',
-          })
-        })
-      }
-
-      return dedupeAgencies(agencies)
-    }
+    const normalizeSearchValue = (value) =>
+      String(value || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim()
 
     const setSummaryState = (message, tone = 'neutral') => {
       const styles = {
@@ -210,6 +136,33 @@
 
       mapSummary.className = styles[tone] || styles.neutral
       mapSummary.textContent = message
+    }
+
+    const renderMarkers = (agencies) => {
+      if (!markersLayer || !mapInstance || !markerIcon) {
+        return []
+      }
+
+      markersLayer.clearLayers()
+
+      const bounds = []
+      const markers = agencies.map((agency) => {
+        const marker = L.marker([agency.lat, agency.lng], { icon: markerIcon }).bindPopup(
+          `<strong>${escapeHtml(agency.bank)}</strong><br>${escapeHtml(agency.address)}`
+        )
+
+        markersLayer.addLayer(marker)
+        bounds.push([agency.lat, agency.lng])
+        return marker
+      })
+
+      if (bounds.length) {
+        mapInstance.fitBounds(bounds, { padding: [30, 30] })
+      } else {
+        mapInstance.setView([7.9465, -1.0232], 6)
+      }
+
+      return markers
     }
 
     const renderBankResult = (result) => {
@@ -234,6 +187,9 @@
                     </div>
                     <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">${index + 1}</span>
                   </div>
+                  <p class="mt-2 text-xs font-medium uppercase tracking-[0.14em] text-slate-500">
+                    ${escapeHtml([agency.province, agency.commune, agency.district].filter(Boolean).join(' / ') || agency.country)}
+                  </p>
                   <p class="mt-3 text-sm leading-6 text-slate-600">${escapeHtml(agency.address)}</p>
                 </button>
               `
@@ -241,7 +197,7 @@
             .join('')
         : `
           <div class="rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-4 text-sm text-slate-500">
-            Aucune agence portant ce nom n'a ete trouvee automatiquement dans ${escapeHtml(result.bank.country)}.
+            Aucune agence enregistree ne correspond a cette recherche pour ${escapeHtml(result.bank.bank)}.
           </div>
         `
 
@@ -250,7 +206,7 @@
           <div>
             <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Banque selectionnee</p>
             <h2 class="mt-1 text-lg font-black text-slate-900">${escapeHtml(result.bank.bank)}</h2>
-            <p class="mt-1 text-sm text-slate-600">Pays explore: ${escapeHtml(result.bank.country)}</p>
+            <p class="mt-1 text-sm text-slate-600">Resultats issus des agences enregistrees dans la base.</p>
           </div>
           <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800">${result.agencies.length} agence${result.agencies.length > 1 ? 's' : ''}</span>
         </div>
@@ -264,7 +220,10 @@
           const markerIndex = Number(button.dataset.index)
           const marker = result.markers[markerIndex]
 
-          mapInstance.flyTo([lat, lng], 14, { duration: 1.2 })
+          if (mapInstance) {
+            mapInstance.flyTo([lat, lng], 14, { duration: 1.2 })
+          }
+
           if (marker) {
             marker.openPopup()
           }
@@ -274,65 +233,132 @@
       mapList.appendChild(wrapper)
     }
 
-    const renderAgencies = async () => {
-      const bankId = bankSelect.value
-      if (!bankId) {
+    const applyAgencySearch = (searchTerm = '') => {
+      if (!currentBank) {
         mapList.innerHTML = ''
-        markersLayer.clearLayers()
+        markersLayer?.clearLayers()
         mapCount.textContent = 'Aucune recherche'
         setSummaryState('Selectionnez d abord une banque pour lancer la recherche.', 'warning')
         return
       }
 
-      const url = `/map/agencies?bankId=${bankId}`
-      const response = await fetch(url, { headers: { Accept: 'application/json' } })
-      const banks = await response.json()
+      const normalizedTerm = normalizeSearchValue(searchTerm)
+      const filteredAgencies = normalizedTerm
+        ? currentAgencies.filter((agency) => {
+            const searchableText = normalizeSearchValue(
+              [
+                agency.address,
+                agency.city,
+                agency.province,
+                agency.commune,
+                agency.district,
+              ].join(' ')
+            )
+
+            return searchableText.includes(normalizedTerm)
+          })
+        : currentAgencies
+
+      currentMarkers = renderMarkers(filteredAgencies)
+      mapList.innerHTML = ''
+      renderBankResult({ bank: currentBank, agencies: filteredAgencies, markers: currentMarkers })
+
+      if (!currentAgencies.length) {
+        mapCount.textContent = '0 agence'
+        setSummaryState(`Aucune agence enregistree n a ete trouvee pour ${currentBank.bank}.`, 'warning')
+        return
+      }
+
+      if (normalizedTerm) {
+        mapCount.textContent = `${filteredAgencies.length} agence${filteredAgencies.length > 1 ? 's' : ''}`
+
+        if (filteredAgencies.length) {
+          setSummaryState(
+            `${filteredAgencies.length} agence${filteredAgencies.length > 1 ? 's correspondent' : ' correspond'} a la recherche "${searchTerm}" pour ${currentBank.bank}.`,
+            'success'
+          )
+        } else {
+          setSummaryState(
+            `Aucune agence ne correspond a la recherche "${searchTerm}" pour ${currentBank.bank}.`,
+            'warning'
+          )
+        }
+
+        return
+      }
+
+      mapCount.textContent = `${currentAgencies.length} agence${currentAgencies.length > 1 ? 's' : ''}`
+      setSummaryState(
+        `${currentAgencies.length} agence${currentAgencies.length > 1 ? 's ont ete trouvees' : ' a ete trouvee'} pour ${currentBank.bank}. Cliquez sur une adresse pour centrer la carte sur l agence choisie.`,
+        'success'
+      )
+    }
+
+    const renderAgencies = async () => {
+      const bankId = bankSelect.value
+      const territory = territorySearchInput.value.trim()
+
+      if (!bankId) {
+        currentBank = null
+        currentAgencies = []
+        currentMarkers = []
+        mapList.innerHTML = ''
+        markersLayer?.clearLayers()
+        mapCount.textContent = 'Aucune recherche'
+        setSummaryState('Selectionnez une banque pour afficher les agences.', 'warning')
+        return
+      }
+
+      const params = new URLSearchParams({ bankId })
+      if (territory) {
+        params.set('territorySearch', territory)
+      }
 
       mapList.innerHTML = ''
-      markersLayer.clearLayers()
-
-      if (!banks.length) {
-        mapCount.textContent = '0 agence'
-        setSummaryState('Aucune ville et aucun pays valides n ont ete trouves pour cette banque.', 'warning')
-        return
-      }
-
-      const bank = banks[0]
+      markersLayer?.clearLayers()
+      currentBank = null
+      currentAgencies = []
+      currentMarkers = []
       mapCount.textContent = 'Recherche en cours'
-      setSummaryState(`La carte parcourt actuellement ${bank.country} pour retrouver les agences de ${bank.bank}.`, 'loading')
-
-      const countryBounds = await getCountryBounds(bank)
-      if (countryBounds?.leafletBounds) {
-        mapInstance.flyToBounds(countryBounds.leafletBounds, { padding: [30, 30], duration: 1.2 })
+      setSummaryState('Chargement des agences enregistrees.', 'loading')
+      if (submitButton) {
+        submitButton.disabled = true
       }
 
-      const agencies = await searchBankAgencies(bank, countryBounds)
-      const bounds = []
-      const markers = []
+      try {
+        const url = `/map/agencies?${params.toString()}`
+        const response = await fetch(url, { headers: { Accept: 'application/json' } })
+        const result = await response.json().catch(() => ({}))
 
-      agencies.forEach((agency, index) => {
-        const marker = L.marker([agency.lat, agency.lng], { icon: markerIcon }).bindPopup(
-          `<strong>${escapeHtml(agency.bank)}</strong><br>${escapeHtml(agency.address)}`
-        )
-        markersLayer.addLayer(marker)
-        markers.push(marker)
-        bounds.push([agency.lat, agency.lng])
-      })
+        if (!response.ok) {
+          mapCount.textContent = '0 agence'
+          setSummaryState(result.message || 'Impossible de charger les agences de cette banque.', 'warning')
+          return
+        }
 
-      renderBankResult({ bank, agencies, markers })
+        const bank = result.bank
+        setSummaryState(`Chargement des agences enregistrees pour ${bank.bank}.`, 'loading')
 
-      if (agencies.length) {
-        mapCount.textContent = `${agencies.length} agence${agencies.length > 1 ? 's' : ''}`
-        setSummaryState(
-          `${agencies.length} agence${agencies.length > 1 ? 's ont ete trouvees' : ' a ete trouvee'} pour ${bank.bank}. Cliquez sur une adresse pour centrer la carte sur l agence la plus proche.`,
-          'success'
-        )
-        mapInstance.fitBounds(bounds, { padding: [30, 30] })
-        return
+        const agencies = normalizeAgencyCoordinates(result.agencies || [])
+        currentBank = bank
+        currentAgencies = agencies
+
+        applyAgencySearch('')
+
+        if (!leafletIsAvailable) {
+          setSummaryState(
+            'Les agences ont ete chargees, mais la carte n est pas disponible pour le moment. La liste reste consultable.',
+            'warning'
+          )
+        }
+      } catch (error) {
+        mapCount.textContent = '0 agence'
+        setSummaryState('La recherche des agences a echoue. Verifiez la connexion ou rechargez la page.', 'warning')
+      } finally {
+        if (submitButton) {
+          submitButton.disabled = false
+        }
       }
-
-      mapCount.textContent = '0 agence'
-      setSummaryState(`Aucune agence portant le nom ${bank.bank} n a ete trouvee automatiquement dans ${bank.country}.`, 'warning')
     }
 
     mapForm.addEventListener('submit', async (event) => {

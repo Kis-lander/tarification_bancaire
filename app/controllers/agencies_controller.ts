@@ -1,47 +1,17 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import AgencyService from '#services/agency_service'
-import User from '#models/user'
+import Bank from '#models/bank'
+import { bankAgencyCreateValidator } from '#validators/user'
 
 type HttpErrorLike = {
   status?: number
   message?: string
 }
 
-type ParsedAddress = {
-  city: string
-  country: string
-  normalizedAddress: string
-}
-
 @inject()
 export default class AgenciesController {
   constructor(protected agencyService: AgencyService) {}
-
-  private parseBankAddress(rawAddress: string | null | undefined): ParsedAddress | null {
-    const value = (rawAddress || '').trim()
-    if (!value) {
-      return null
-    }
-
-    const parts = value
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean)
-
-    if (parts.length < 2) {
-      return null
-    }
-
-    const city = parts[0]
-    const country = parts.slice(1).join(', ')
-
-    return {
-      city,
-      country,
-      normalizedAddress: `${city}, ${country}`,
-    }
-  }
 
   async index({ response }: HttpContext) {
     try {
@@ -63,24 +33,43 @@ export default class AgenciesController {
     }
   }
 
-  async store({ auth, request, response }: HttpContext) {
+  async store({ auth, request, response, session }: HttpContext) {
     try {
       const user = auth.use('web').user!
+      const wantsJson = (request.header('accept') || '').includes('application/json')
+      const normalizedUserBankId = Number(user.bankId)
 
-      if (!user.bankId) {
-        return response.badRequest({ message: 'Ce compte BANK nest rattache a aucune banque.' })
+      if (!Number.isFinite(normalizedUserBankId) || normalizedUserBankId <= 0) {
+        if (wantsJson) {
+          return response.badRequest({ message: 'Ce compte BANK nest rattache a aucune banque.' })
+        }
+
+        session.flash('error', 'Ce compte BANK nest rattache a aucune banque.')
+        return response.redirect('/bank/account')
       }
 
-      const data = request.only(['bankId', 'city', 'address', 'latitude', 'longitude'])
+      const payload = await request.validateUsing(bankAgencyCreateValidator)
       const agency = await this.agencyService.create(
-        { ...data, bankId: Number(data.bankId) },
-        user.bankId
+        { ...payload, bankId: normalizedUserBankId },
+        normalizedUserBankId
       )
 
-      return response.created(agency)
+      if (wantsJson) {
+        return response.created(agency)
+      }
+
+      session.flash('success', 'Agence enregistree avec succes.')
+      return response.redirect('/bank/account#bank-agencies')
     } catch (error) {
       const err = error as HttpErrorLike
-      return response.status(err.status ?? 400).send({ message: err.message })
+      const wantsJson = (request.header('accept') || '').includes('application/json')
+
+      if (wantsJson) {
+        return response.status(err.status ?? 400).send({ message: err.message })
+      }
+
+      session.flash('error', err.message || "Erreur lors de l'enregistrement de l'agence.")
+      return response.redirect().back()
     }
   }
 
@@ -118,55 +107,58 @@ export default class AgenciesController {
   }
 
   async map({ request, response }: HttpContext) {
-    const { bankId } = request.qs()
+    try {
+      const { bankId, territorySearch } = request.qs()
 
-    let bankUsersQuery = User.query()
-      .where('rule', 'BANK')
-      .whereNotNull('addresses')
-      .preload('bank')
+      const normalizedBankId = Number(bankId)
+      if (!normalizedBankId) {
+        return response.badRequest({ message: 'Le parametre bankId est requis.' })
+      }
 
-    if (bankId) {
-      bankUsersQuery = bankUsersQuery.where('bank_id', bankId)
+      const bank = await Bank.find(normalizedBankId)
+      if (!bank) {
+        return response.notFound({ message: 'Banque introuvable.' })
+      }
+
+      const agencies = await this.agencyService.getByBank(normalizedBankId)
+      const normalizedTerritory = String(territorySearch || '')
+        .trim()
+        .toLowerCase()
+
+      const filteredAgencies = normalizedTerritory
+        ? agencies.filter((agency) => {
+            const haystack = [agency.city, agency.address].join(' ').toLowerCase()
+            return haystack.includes(normalizedTerritory)
+          })
+        : agencies
+
+      return response.ok({
+        bank: {
+          id: bank.id,
+          bankId: bank.id,
+          bank: bank.name,
+        },
+        agencies: filteredAgencies.map((agency) => ({
+          id: agency.id,
+          bankId: bank.id,
+          bank: bank.name,
+          city: agency.city,
+          country: '',
+          province: '',
+          commune: '',
+          district: '',
+          address: agency.address,
+          addressLines: [agency.address],
+          lat: Number(agency.latitude),
+          lng: Number(agency.longitude),
+          sourceLabel: 'Agence enregistree',
+        })),
+      })
+    } catch (error) {
+      const err = error as HttpErrorLike
+      return response
+        .status(err.status ?? 500)
+        .send({ message: err.message || 'Impossible de recuperer les agences de cette banque.' })
     }
-
-    const bankUsers = await bankUsersQuery
-
-    const uniqueBankLocations = new Map<
-      string,
-      {
-        id: number
-        bankId: number
-        bank: string
-        city: string
-        country: string
-        address: string
-        searchQuery: string
-        sourceLabel: string
-      }
-    >()
-
-    bankUsers.forEach((user) => {
-      const parsedAddress = this.parseBankAddress(user.addresses)
-      if (!parsedAddress || !user.bankId) {
-        return
-      }
-      const bankName = user.bank?.name || 'Banque inconnue'
-      const key = `${user.bankId}::${parsedAddress.city.toLowerCase()}::${parsedAddress.country.toLowerCase()}`
-
-      if (!uniqueBankLocations.has(key)) {
-        uniqueBankLocations.set(key, {
-          id: user.bankId,
-          bankId: user.bankId,
-          bank: bankName,
-          city: parsedAddress.city,
-          country: parsedAddress.country,
-          address: parsedAddress.normalizedAddress,
-          searchQuery: `${bankName}, ${parsedAddress.country}`,
-          sourceLabel: 'Ville et pays declares par la banque',
-        })
-      }
-    })
-
-    return response.ok(Array.from(uniqueBankLocations.values()))
   }
 }

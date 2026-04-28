@@ -63,16 +63,16 @@
       </div>
 
       <div class="md:col-span-2">
-        <label for="signup-address" class="mb-2 block text-sm font-bold text-slate-900">Ville et pays</label>
+        <label for="signup-address" class="mb-2 block text-sm font-bold text-slate-900">Pays</label>
         <input
           id="signup-address"
           name="addresses"
           type="text"
           value="{{ old('addresses', '') }}"
           class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 {{ flashMessages.get('inputErrorsBag', {}).addresses ? 'border-rose-400' : '' }}"
-          placeholder="Kinshasa, RDC"
+          placeholder="RDC"
         />
-        <p class="mt-2 text-xs font-medium text-slate-500">Renseignez seulement la ville et le pays au format "Ville, Pays".</p>
+        <p class="mt-2 text-xs font-medium text-slate-500">Seul le pays sera enregistre, meme si vous saisissez une ville avec.</p>
         @if(flashMessages.get('inputErrorsBag', {}).addresses)
           <p class="mt-2 text-sm text-rose-700">{{ flashMessages.get('inputErrorsBag', {}).addresses[0] }}</p>
         @end

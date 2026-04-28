@@ -12,33 +12,56 @@ export default class AgencyService {
   }
 
   async create(data: any, bankId: number) {
-    const bank = await Bank.findOrFail(data.bankId)
+    const normalizedBankId = Number(bankId)
+    const normalizedPayloadBankId = Number(data?.bankId ?? bankId)
 
-    if (bank.id !== bankId) {
+    if (!Number.isFinite(normalizedBankId) || normalizedBankId <= 0) {
+      throw new Exception('Banque invalide pour cette operation', { status: 400 })
+    }
+
+    if (!Number.isFinite(normalizedPayloadBankId) || normalizedPayloadBankId <= 0) {
+      throw new Exception("Impossible d'identifier la banque rattachee a cette agence", {
+        status: 400,
+      })
+    }
+
+    const bank = await Bank.findOrFail(normalizedPayloadBankId)
+
+    if (bank.id !== normalizedBankId) {
       throw new Exception("Acces refuse : vous n'etes pas autorise a gerer cette banque", {
         status: 403,
       })
     }
 
     try {
-      return await Agency.create(data)
+      return await Agency.create({
+        ...data,
+        bankId: normalizedBankId,
+      })
     } catch {
       throw new Exception("Erreur lors de la creation de l'agence", { status: 400 })
     }
   }
 
   async getByBank(bankId: number) {
+    const normalizedBankId = Number(bankId)
+
+    if (!Number.isFinite(normalizedBankId) || normalizedBankId <= 0) {
+      throw new Exception('Banque non trouvee ou erreur de lecture', { status: 404 })
+    }
+
     try {
-      return await Agency.query().where('bankId', bankId)
+      return await Agency.query().where('bankId', normalizedBankId)
     } catch {
       throw new Exception('Banque non trouvee ou erreur de lecture', { status: 404 })
     }
   }
 
   async update(id: number, data: any, bankId: number) {
+    const normalizedBankId = Number(bankId)
     const agency = await Agency.findOrFail(id)
 
-    if (agency.bankId !== bankId) {
+    if (!Number.isFinite(normalizedBankId) || agency.bankId !== normalizedBankId) {
       throw new Exception('Acces refuse : modification interdite', { status: 403 })
     }
 
@@ -52,9 +75,10 @@ export default class AgencyService {
   }
 
   async delete(id: number, bankId: number) {
+    const normalizedBankId = Number(bankId)
     const agency = await Agency.findOrFail(id)
 
-    if (agency.bankId !== bankId) {
+    if (!Number.isFinite(normalizedBankId) || agency.bankId !== normalizedBankId) {
       throw new Exception('Acces refuse : suppression interdite', { status: 403 })
     }
 

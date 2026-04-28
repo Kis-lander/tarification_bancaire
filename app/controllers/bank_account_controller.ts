@@ -10,6 +10,16 @@ import hash from '@adonisjs/core/services/hash'
 export default class BankAccountController {
   constructor(protected emailService: EmailService) {}
 
+  private normalizeCountryAddress(address: string) {
+    return (
+      address
+        .split(/[,;\n\r]+/)
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .pop() || ''
+    )
+  }
+
   async edit({ auth, view, response, session }: HttpContext) {
     const user = auth.use('web').user!
 
@@ -18,7 +28,10 @@ export default class BankAccountController {
       return response.redirect('/')
     }
 
-    const bank = await Bank.findOrFail(user.bankId)
+    const bank = await Bank.query()
+      .where('id', user.bankId)
+      .preload('agencies', (query) => query.orderBy('createdAt', 'desc'))
+      .firstOrFail()
 
     return view.render('pages/bank/account', {
       bank,
@@ -48,12 +61,7 @@ export default class BankAccountController {
     }
 
     const normalizedEmail = payload.email.trim().toLowerCase()
-    const normalizedAddresses = payload.addresses
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean)
-      .slice(0, 2)
-      .join(', ')
+    const normalizedAddresses = this.normalizeCountryAddress(payload.addresses)
 
     const emailOwner = await User.query()
       .whereRaw('LOWER(email) = LOWER(?)', [normalizedEmail])
@@ -88,7 +96,7 @@ export default class BankAccountController {
     }
 
     if ((user.addresses || '') !== normalizedAddresses) {
-      updatedFields.push('Ville et pays')
+      updatedFields.push('Pays')
     }
 
     user.email = normalizedEmail
