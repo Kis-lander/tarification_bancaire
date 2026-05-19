@@ -30,6 +30,9 @@ export default await Env.create(new URL('../', import.meta.url), {
   SMTP_USERNAME: Env.schema.string.optional(),
   SMTP_PASSWORD: Env.schema.string.optional(),
   SMTP_ENCRYPTION: Env.schema.string.optional(),
+  BCC_SEED_EMAIL: Env.schema.string.optional(),
+  BCC_SEED_PASSWORD: Env.schema.string.optional(),
+  DATABASE_URL: Env.schema.string.optional(),
 
   // Session
   SESSION_DRIVER: Env.schema.enum(['cookie', 'memory', 'database'] as const),
