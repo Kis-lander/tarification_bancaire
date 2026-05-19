@@ -56,15 +56,49 @@
         --institution-success: #2e7d32;
         --institution-border: rgba(69, 90, 100, 0.22);
         --institution-border-strong: rgba(69, 90, 100, 0.32);
-        --institution-surface: rgba(255, 255, 255, 0.92);
+        --institution-surface: rgba(255, 255, 255, 0.42);
+      }
+
+      html {
+        min-height: 100%;
+        background: #eef9ff;
       }
 
       body {
         font-family: 'Inter', sans-serif;
-        background:
-          linear-gradient(180deg, rgba(26, 35, 126, 0.04) 0%, rgba(248, 249, 250, 0.98) 18%, #f8f9fa 100%);
+        min-height: 100%;
+        position: relative;
+        isolation: isolate;
+        background: #eaf8ff;
         color: var(--institution-anthracite);
-        letter-spacing: -0.01em;
+        letter-spacing: 0;
+      }
+
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        background: url('/images/bcc.jpeg') center center / 150vmax auto no-repeat;
+        transform: scale(1.08);
+        transform-origin: center;
+        opacity: 0.95;
+        mix-blend-mode: multiply;
+        pointer-events: none;
+      }
+
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background: rgba(255, 255, 255, 0.08);
+        pointer-events: none;
+      }
+
+      body > * {
+        position: relative;
+        z-index: 1;
       }
 
       .data-mono {
@@ -75,6 +109,8 @@
 
       main {
         color: var(--institution-anthracite);
+        background: transparent;
+        border-radius: 1.5rem;
       }
 
       h1,
@@ -84,7 +120,7 @@
       h5,
       h6 {
         color: var(--institution-navy);
-        letter-spacing: -0.03em;
+        letter-spacing: 0;
       }
 
       table,
@@ -174,15 +210,15 @@
       .bg-slate-50,
       .bg-stone-50,
       .bg-blue-50 {
-        background-color: rgba(248, 249, 250, 0.96) !important;
+        background-color: rgba(248, 249, 250, 0.42) !important;
       }
 
       .bg-emerald-50 {
-        background-color: rgba(46, 125, 50, 0.08) !important;
+        background-color: rgba(46, 125, 50, 0.16) !important;
       }
 
       .bg-blue-100 {
-        background-color: rgba(26, 35, 126, 0.08) !important;
+        background-color: rgba(26, 35, 126, 0.16) !important;
       }
 
       .tracking-\[0\.2em\],
@@ -204,5 +240,6 @@
     </main>
 
     @include('partials/footer')
+    @vite(['resources/js/app.js'])
   </body>
 </html>

@@ -1,9 +1,9 @@
-<header class="sticky top-0 z-50 border-b border-slate-200 bg-white/95 text-state-navy shadow-sm backdrop-blur">
+<header class="sticky top-0 z-50 border-b border-sky-200 bg-sky-100/95 text-state-navy shadow-sm backdrop-blur">
   @let(isBccScreen = request.url().startsWith('/bcc'))
 
   <div class="mx-auto flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
     <a href="/" class="flex items-center gap-3">
-      <span class="flex h-12 w-20 items-center justify-center overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-lg">
+      <span class="flex h-12 w-20 items-center justify-center overflow-hidden rounded-2xl border border-sky-200 bg-white shadow-lg">
         <img src="/images/bcc.jpeg" alt="Logo BCC" class="h-full w-full object-cover" />
       </span>
       <span>
@@ -20,12 +20,12 @@
       <a href="/history" class="text-[12px] font-medium uppercase tracking-[0.1em] text-state-body transition hover:text-accent-500">Historique</a>
       <a href="/analytics" class="text-[12px] font-medium uppercase tracking-[0.1em] text-state-body transition hover:text-accent-500">Analyses</a>
       @if(currentUser && currentUser.rule === 'BANK')
-        <a href="/bank/tariffs" class="text-[12px] font-medium uppercase tracking-[0.1em] text-state-body transition hover:text-accent-500">Fixer les tarifications</a>
+        <a href="/bank/tariffs" class="text-[12px] font-medium uppercase tracking-[0.1em] text-state-body transition hover:text-accent-500">Gestion des tarifs</a>
       @end
       @if(!currentUser && !currentBccUser)
         <a
           href="/bcc"
-          class="ml-[3rem] rounded-full border border-state-navy px-4 py-2 text-[12px] font-semibold text-state-navy transition hover:border-accent-500 hover:text-accent-500"
+          class="ml-[3rem] rounded-full border border-rose-300 bg-rose-50/85 px-4 py-2 text-[12px] font-semibold text-rose-800 shadow-sm transition hover:border-rose-400 hover:bg-rose-100 hover:text-rose-900"
         >
           Espace BCC
         </a>
@@ -34,32 +34,65 @@
 
     <div class="hidden items-center gap-3 md:flex">
       @if(currentUser || currentBccUser)
-        <div class="relative" x-data="{ open: false }">
-          <button @click="open = !open" @click.outside="open = false" class="flex items-center gap-3 rounded-full border border-stone-200 bg-stone-50 p-[6px] shadow-md shadow-slate-700/40">
-            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-state-navy text-xl font-bold text-black">
+        <div class="relative account-menu">
+          <button type="button" data-account-trigger class="flex items-center gap-3 rounded-full border border-sky-200 bg-white p-[6px] shadow-md shadow-slate-700/20">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full border border-white text-xl font-black shadow-sm" style="background-color: #1A237E; color: #ffffff;">
               {{ currentUser ? currentUser.email.charAt(0).toUpperCase() : (currentBccUser ? currentBccUser.email.charAt(0).toUpperCase() : 'U') }}
             </span>
           </button>
 
           <div
-            x-show="open"
-            class="absolute right-0 z-50 mt-2 w-56 rounded-xl border border-stone-200 bg-white p-4 shadow-xl"
-            style="display: none;"
-            x-transition
+            data-account-panel
+            class="absolute right-0 z-50 mt-3 hidden w-80 rounded-2xl border border-sky-200 bg-white p-5 shadow-xl shadow-slate-900/15"
           >
-            <div class="space-y-1">
-              <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-accent-500">Informations du compte</p>
-              <p class="text-[13px] font-bold text-slate-900">{{ currentUser ? (currentUser.rule || 'Utilisateur') : (isBccAuthenticated ? 'Administrateur BCC' : 'Utilisateur') }}</p>
-              <p class="text-[12px] text-slate-500 italic">{{ currentUser ? currentUser.email : (currentBccUser ? currentBccUser.email : '') }}</p>
-              @if(currentUser && currentUser.rule === 'BANK')
+            @if(currentBccUser)
+              <div class="space-y-4">
+                <div class="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3">
+                  <p class="text-[10px] font-black uppercase tracking-[0.16em] text-rose-700">Informations BCC</p>
+                  <p class="mt-1 text-base font-black text-state-navy">Banque Centrale du Congo</p>
+                  <p class="mt-1 text-xs font-medium text-slate-600">Portail de validation des tarifs bancaires</p>
+                </div>
+
+                <div class="grid gap-3 text-sm">
+                  <div>
+                    <p class="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Compte connecté</p>
+                    <p class="mt-1 break-words font-semibold text-slate-900">{{ currentBccUser.email }}</p>
+                  </div>
+                  <div class="grid grid-cols-2 gap-3">
+                    <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-3">
+                      <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-700">Statut</p>
+                      <p class="mt-1 text-sm font-bold text-emerald-800">Actif</p>
+                    </div>
+                    <div class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-3">
+                      <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-amber-700">Rôle</p>
+                      <p class="mt-1 text-sm font-bold text-amber-900">{{ currentBccUser.role || 'BCC' }}</p>
+                    </div>
+                  </div>
+                </div>
+
                 <a
-                  href="/bank/account"
-                  class="mt-3 inline-flex rounded-full border border-state-navy px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-state-navy transition hover:border-accent-500 hover:text-accent-500"
+                  href="/bcc"
+                  class="block rounded-xl border border-state-navy px-4 py-3 text-center text-xs font-bold uppercase tracking-[0.08em] transition hover:opacity-90"
+                  style="background-color: #1A237E; color: #ffffff;"
                 >
-                  Edit account
+                  Ouvrir l'espace BCC
                 </a>
-              @end
-            </div>
+              </div>
+            @else
+              <div class="space-y-1">
+                <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-accent-500">Informations du compte</p>
+                <p class="text-[13px] font-bold text-slate-900">{{ currentUser ? (currentUser.rule || 'Utilisateur') : 'Utilisateur' }}</p>
+                <p class="text-[12px] text-slate-500 italic">{{ currentUser ? currentUser.email : '' }}</p>
+                @if(currentUser && currentUser.rule === 'BANK')
+                  <a
+                    href="/bank/account"
+                    class="mt-3 inline-flex rounded-full border border-state-navy px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-state-navy transition hover:border-accent-500 hover:text-accent-500"
+                  >
+                    Modifier le compte
+                  </a>
+                @end
+              </div>
+            @end
           </div>
         </div>
 
@@ -67,18 +100,18 @@
           {{ csrfField() }}
           <button
             type="submit"
-            class="rounded-full bg-state-navy px-5 py-2.5 text-[12px] font-semibold text-[red] shadow-md shadow-slate-700/40 transition hover:bg-institution-800"
+            class="rounded-full border border-rose-200 bg-white px-5 py-2.5 text-[12px] font-semibold text-rose-700 shadow-sm transition hover:border-rose-300 hover:bg-rose-50"
           >
             Se déconnecter
           </button>
         </form>
       @else
-        <a href="/login" class="px-2 py-2 text-[12px] font-semibold text-[green] transition hover:text-accent-500">
+        <a href="/login" class="rounded-full border border-state-navy bg-white/70 px-4 py-2 text-[12px] font-semibold text-state-navy shadow-sm transition hover:border-accent-500 hover:bg-white hover:text-accent-500">
           Se connecter
         </a>
         <a
           href="/signup"
-          class="rounded-full border border-[red] bg-sky-50 px-5 py-2.5 text-[12px] font-semibold text-sky-700 shadow-sm transition hover:bg-sky-100"
+          class="rounded-full border border-[#1A237E] !bg-[#1A237E] px-5 py-2.5 text-[12px] font-semibold !text-white shadow-sm transition hover:border-[#24323d] hover:!bg-[#24323d]"
         >
           S'inscrire
         </a>
@@ -100,7 +133,7 @@
   </div>
 
   <div id="mobile-menu" class="absolute top-[10rem] z-50 hidden w-[min(82vw,320px)] justify-end md:hidden">
-    <nav class="grid gap-[1rem] rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4 shadow-xl">
+    <nav class="grid gap-[1rem] rounded-[1.5rem] border border-sky-200 bg-sky-50 p-4 shadow-xl">
       <a href="/" class="px-4 text-center text-[12px] font-medium uppercase tracking-[0.1em] text-state-body hover:text-accent-500">Accueil</a>
       <a href="/banks" class="px-4 text-center text-[12px] font-medium uppercase tracking-[0.1em] text-state-body hover:text-accent-500">Banques</a>
       <a href="/compare" class="px-4 text-center text-[12px] font-medium uppercase tracking-[0.1em] text-state-body hover:text-accent-500">Comparaison</a>
@@ -108,44 +141,76 @@
       <a href="/history" class="px-4 text-center text-[12px] font-medium uppercase tracking-[0.1em] text-state-body hover:text-accent-500">Historique</a>
       <a href="/analytics" class="px-4 text-center text-[12px] font-medium uppercase tracking-[0.1em] text-state-body hover:text-accent-500">Analyses</a>
       @if(currentUser && currentUser.rule === 'BANK')
-        <a href="/bank/tariffs" class="px-4 text-center text-[12px] font-medium uppercase tracking-[0.1em] text-state-body hover:text-accent-500">Fixer les tarifications</a>
+        <a href="/bank/tariffs" class="px-4 text-center text-[12px] font-medium uppercase tracking-[0.1em] text-state-body hover:text-accent-500">Gestion des tarifs</a>
       @end
       @if(!currentUser && !currentBccUser)
-        <a href="/bcc" class="px-4 text-center text-[12px] font-medium uppercase tracking-[0.1em] text-accent-500 hover:text-state-navy">Espace BCC</a>
+        <a href="/bcc" class="rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.1em] text-rose-800 hover:border-rose-400 hover:bg-rose-100 hover:text-rose-900">Espace BCC</a>
       @end
       @if(currentUser || currentBccUser)
-        <div class="mt-[1rem]" x-data="{ open: false }">
-          <button @click="open = !open" @click.outside="open = false" class="flex items-center rounded-full border border-stone-200 bg-stone-50 pl-[3.5rem] shadow-md">
-            <span class="flex h-10 w-10 items-center rounded-full bg-state-navy text-xl font-bold text-black">
+        <div class="account-menu mt-[1rem]">
+          <button type="button" data-account-trigger class="flex items-center rounded-full border border-sky-200 bg-white pl-[3.5rem] shadow-md">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full border border-white text-xl font-black shadow-sm" style="background-color: #1A237E; color: #ffffff;">
               {{ currentUser ? currentUser.email.charAt(0).toUpperCase() : (currentBccUser ? currentBccUser.email.charAt(0).toUpperCase() : 'U') }}
             </span>
           </button>
 
           <div
-            x-show="open"
-            class="absolute right-0 z-50 mt-2 w-56 rounded-xl border border-stone-200 bg-white p-4 shadow-xl"
-            style="display: none;"
-            x-transition
+            data-account-panel
+            class="absolute right-4 z-50 mt-3 hidden w-[min(88vw,320px)] rounded-2xl border border-sky-200 bg-white p-5 shadow-xl shadow-slate-900/15"
           >
-            <div class="space-y-1">
-              <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-accent-500">Informations du compte</p>
-              <p class="text-[13px] font-bold text-slate-900">{{ currentUser ? (currentUser.rule || 'Utilisateur') : (isBccAuthenticated ? 'Administrateur BCC' : 'Utilisateur') }}</p>
-              <p class="text-[11px] text-slate-500 italic">{{ currentUser ? currentUser.email : (currentBccUser ? currentBccUser.email : '') }}</p>
-              @if(currentUser && currentUser.rule === 'BANK')
+            @if(currentBccUser)
+              <div class="space-y-4">
+                <div class="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3">
+                  <p class="text-[10px] font-black uppercase tracking-[0.16em] text-rose-700">Informations BCC</p>
+                  <p class="mt-1 text-base font-black text-state-navy">Banque Centrale du Congo</p>
+                  <p class="mt-1 text-xs font-medium text-slate-600">Portail de validation des tarifs bancaires</p>
+                </div>
+
+                <div>
+                  <p class="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Compte connecté</p>
+                  <p class="mt-1 break-words text-sm font-semibold text-slate-900">{{ currentBccUser.email }}</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-3">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-700">Statut</p>
+                    <p class="mt-1 text-sm font-bold text-emerald-800">Actif</p>
+                  </div>
+                  <div class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-3">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.12em] text-amber-700">Rôle</p>
+                    <p class="mt-1 text-sm font-bold text-amber-900">{{ currentBccUser.role || 'BCC' }}</p>
+                  </div>
+                </div>
+
                 <a
-                  href="/bank/account"
-                  class="mt-3 inline-flex rounded-full border border-state-navy px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-state-navy transition hover:border-accent-500 hover:text-accent-500"
+                  href="/bcc"
+                  class="block rounded-xl border border-state-navy px-4 py-3 text-center text-xs font-bold uppercase tracking-[0.08em]"
+                  style="background-color: #1A237E; color: #ffffff;"
                 >
-                  Edit account
+                  Ouvrir l'espace BCC
                 </a>
-              @end
-            </div>
+              </div>
+            @else
+              <div class="space-y-1">
+                <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-accent-500">Informations du compte</p>
+                <p class="text-[13px] font-bold text-slate-900">{{ currentUser ? (currentUser.rule || 'Utilisateur') : 'Utilisateur' }}</p>
+                <p class="text-[11px] text-slate-500 italic">{{ currentUser ? currentUser.email : '' }}</p>
+                @if(currentUser && currentUser.rule === 'BANK')
+                  <a
+                    href="/bank/account"
+                    class="mt-3 inline-flex rounded-full border border-state-navy px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-state-navy transition hover:border-accent-500 hover:text-accent-500"
+                  >
+                    Modifier le compte
+                  </a>
+                @end
+              </div>
+            @end
           </div>
         </div>
 
         <form action="/logout" method="POST">
           {{ csrfField() }}
-          <button type="submit" class="w-full rounded-full bg-blue-50 px-4 py-3 text-center text-[12px] font-semibold text-[red]">
+          <button type="submit" class="w-full rounded-full border border-rose-200 bg-white px-4 py-3 text-center text-[12px] font-semibold text-rose-700">
             Se déconnecter
           </button>
         </form>
@@ -157,10 +222,10 @@
             </a>
           @end
           <div class="grid grid-cols-2 gap-3">
-            <a href="/login" class="rounded-xl bg-state-navy px-4 py-3 text-center text-[12px] font-semibold text-[green]">
+            <a href="/login" class="rounded-xl border border-state-navy bg-white px-4 py-3 text-center text-[12px] font-semibold text-state-navy">
               Connexion
             </a>
-            <a href="/signup" class="rounded-xl border border-[red] bg-white px-4 py-3 text-center text-[12px] font-semibold text-state-navy">
+            <a href="/signup" class="rounded-xl border border-[#1A237E] !bg-[#1A237E] px-4 py-3 text-center text-[12px] font-semibold !text-white">
               Inscription
             </a>
           </div>
@@ -172,6 +237,7 @@
   <script>
     const menuButton = document.getElementById('menu-btn')
     const mobileMenu = document.getElementById('mobile-menu')
+    const accountMenus = document.querySelectorAll('.account-menu')
 
     if (menuButton && mobileMenu) {
       menuButton.addEventListener('click', () => {
@@ -188,5 +254,38 @@
         }
       })
     }
+
+    accountMenus.forEach((menu) => {
+      const trigger = menu.querySelector('[data-account-trigger]')
+      const panel = menu.querySelector('[data-account-panel]')
+
+      if (!trigger || !panel) {
+        return
+      }
+
+      trigger.addEventListener('click', (event) => {
+        event.stopPropagation()
+
+        accountMenus.forEach((otherMenu) => {
+          const otherPanel = otherMenu.querySelector('[data-account-panel]')
+
+          if (otherPanel && otherPanel !== panel) {
+            otherPanel.classList.add('hidden')
+          }
+        })
+
+        panel.classList.toggle('hidden')
+      })
+    })
+
+    document.addEventListener('click', (event) => {
+      accountMenus.forEach((menu) => {
+        const panel = menu.querySelector('[data-account-panel]')
+
+        if (panel && !menu.contains(event.target)) {
+          panel.classList.add('hidden')
+        }
+      })
+    })
   </script>
 </header>

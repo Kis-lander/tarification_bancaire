@@ -30,19 +30,19 @@
 
             <div class="mt-5 grid gap-4">
               <div class="rounded-2xl bg-white px-4 py-3">
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Adresse email</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Adresse email</p>
                 <p class="mt-2 text-sm font-semibold text-slate-900">{{ registration.email }}</p>
               </div>
 
               <div class="rounded-2xl bg-white px-4 py-3">
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Description</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Description</p>
                 <p class="mt-2 text-sm leading-6 text-slate-600">
                   {{ registration.bankDescription && registration.bankDescription.trim() ? registration.bankDescription : 'Aucune description fournie.' }}
                 </p>
               </div>
 
               <div class="rounded-2xl bg-white px-4 py-3">
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Adresse ou adresses</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Adresse ou adresses</p>
                 <p class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">
                   {{ registration.addresses && registration.addresses.trim() ? registration.addresses : 'Aucune adresse fournie.' }}
                 </p>
